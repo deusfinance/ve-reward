@@ -35,6 +35,18 @@ contract RewardStrategy {
         return rewardPoints[getEpoch(timestamp)].amount;
     }
 
+    function getRewardPointsBetweenTimestamps(
+        uint256 startTimestamp,
+        uint256 endTimestamp
+    ) public view returns (RewardPoint[] memory points) {
+        uint256 startEpoch = getEpoch(startTimestamp);
+        uint256 endEpoch = getEpoch(endTimestamp);
+        uint256 length = endEpoch - startEpoch + 1;
+        points = new RewardPoint[](length);
+        for (uint256 i = 0; i < length; i++)
+            points[i] = (rewardPoints[startEpoch + i]);
+    }
+
     function getEpoch(uint256 timestamp) public view returns (uint256) {
         uint256 first;
         uint256 last = lastEpoch;
