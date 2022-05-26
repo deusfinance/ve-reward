@@ -100,14 +100,18 @@ describe("VeDist", () => {
     let pendingRewards = await veDist.getPendingRewardsTimes(ve2, 3);
     expect(pendingRewards).eq(600);
   });
-  // it("should claim", async () => {
-  //   // there are three pending periods for ve2
-  //   await mockVe.mock.isApprovedOrOwner
-  //     .withArgs(user2.address, ve2)
-  //     .returns(true);
-  //   await mockRewardStrategy.mock.getRewardAmount.returns(BigNumber.from(1000));
-  //   await mockVe.mock.balanceOfNFTAt.returns(BigNumber.from(20));
-  //   await mockVe.mock.totalSupplyAtT.returns(BigNumber.from(100));
-  //   await veDist.connect(user2).claim(ve2);
-  // });
+  it("should claim", async () => {
+    // there is one pending period for ve2
+    await setTimeToNextThursdayMidnight(); // one period
+
+    await mockVe.mock.isApprovedOrOwner
+      .withArgs(user2.address, ve2)
+      .returns(true);
+    await mockRewardStrategy.mock.getRewardAmount.returns(BigNumber.from(1000));
+    await mockVe.mock.balanceOfNFTAt.returns(BigNumber.from(20));
+    await mockVe.mock.totalSupplyAtT.returns(BigNumber.from(100));
+    await veDist.connect(user2).claim(ve2);
+    let pendingPeriods = await veDist.getPendingRewardPeriods(ve2);
+    expect(pendingPeriods.length).eq(0);
+  });
 });

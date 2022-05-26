@@ -74,7 +74,6 @@ contract VeDist {
         view
         returns (uint256)
     {
-        // if (times == 0) return 0;
         uint256[] memory pendingRewards = getPendingRewardPeriods(tokenId);
 
         uint256 length = (times < pendingRewards.length)
@@ -91,7 +90,9 @@ contract VeDist {
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
             "VeDist: NOT_APPROVED"
         );
-        lastClaimPeriod[tokenId] = getActivePeriod();
+        lastClaimPeriod[tokenId] = getLastClaimPeriod(tokenId) + times * WEEK;
+        uint256 rewards = getPendingRewardsTimes(tokenId, times);
+        Ive(ve).deposit_for(tokenId, rewards);
     }
 
     function claim(uint256 tokenId) public {
