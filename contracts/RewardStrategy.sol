@@ -3,6 +3,8 @@
 
 pragma solidity 0.8.14;
 
+import "hardhat/console.sol";
+
 contract RewardStrategy {
     struct RewardPoint {
         uint256 timestamp;
@@ -26,18 +28,21 @@ contract RewardStrategy {
     }
 
     function getEpoch(uint256 timestamp) public view returns (uint256) {
-        uint256 start;
-        uint256 end = lastEpoch;
-        while (start < end) {
-            uint256 mid = (end + start) / 2;
-            if (
+        uint256 first;
+        uint256 last = lastEpoch;
+        while (first <= last) {
+            uint256 mid = (first + last) / 2;
+            if (first == last && timestamp >= rewardPoints[first].timestamp) {
+                return first;
+            } else if (
                 timestamp >= rewardPoints[mid].timestamp &&
                 timestamp < rewardPoints[mid + 1].timestamp
-            ) return mid;
-            if (timestamp > rewardPoints[mid].timestamp) {
-                start = mid + 1;
+            ) {
+                return mid;
+            } else if (timestamp >= rewardPoints[mid].timestamp) {
+                first = mid + 1;
             } else {
-                end = mid - 1;
+                last = mid - 1;
             }
         }
         return 0;
