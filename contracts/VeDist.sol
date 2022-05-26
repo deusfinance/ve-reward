@@ -97,7 +97,6 @@ contract VeDist {
 
     function claim(uint256 tokenId) public {
         uint256 times = getPendingRewardPeriods(tokenId).length;
-        // todo: check no reward
         claimTimes(tokenId, times);
     }
 }
