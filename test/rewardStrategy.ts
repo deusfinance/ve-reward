@@ -2,7 +2,10 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
-import { deployTokenTest } from "../scripts/deployHelpers";
+import {
+  deployRewardStrategy,
+  deployTokenTest,
+} from "../scripts/deployHelpers";
 import { RewardStrategy, VeDist } from "../typechain";
 import {
   getActivePeriod,
@@ -18,11 +21,7 @@ describe("RewardStrategy", () => {
     [me] = await ethers.getSigners();
   });
   it("should deploy VeDist", async () => {
-    let rewardStrategyFactory = await ethers.getContractFactory(
-      "RewardStrategy"
-    );
-    rewardStrategy = await rewardStrategyFactory.deploy();
-    await rewardStrategy.deployed();
+    rewardStrategy = await deployRewardStrategy(me.address);
   });
   it("reward should be zero", async () => {
     let latestRewardPerBlock = await rewardStrategy.getLatestRewardPerBlock();

@@ -4,8 +4,9 @@
 pragma solidity 0.8.14;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract RewardStrategy {
+contract RewardStrategy is AccessControl {
     struct RewardPoint {
         uint256 timestamp;
         uint256 amount;
@@ -14,7 +15,10 @@ contract RewardStrategy {
     mapping(uint256 => RewardPoint) public rewardPoints;
     uint256 public lastEpoch;
 
-    constructor() {}
+    constructor(address admin) {
+        require(admin != address(0), "RewardStrategy: ZERO_ADDRESS");
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+    }
 
     function getLatestRewardPerBlock() public view returns (uint256) {
         return rewardPoints[lastEpoch].amount;
