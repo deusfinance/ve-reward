@@ -5,8 +5,12 @@ pragma solidity 0.8.14;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract RewardStrategy is AccessControl {
+    using SafeERC20 for IERC20;
+
     struct RewardPoint {
         uint256 timestamp;
         uint256 amount;
@@ -70,5 +74,20 @@ contract RewardStrategy is AccessControl {
             }
         }
         return 0;
+    }
+
+    function emergencyWithdrawETH(address to, uint256 amount)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        payable(to).transfer(amount);
+    }
+
+    function emergencyWithdrawERC20(
+        address token_,
+        address to,
+        uint256 amount
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        IERC20(token_).safeTransfer(to, amount);
     }
 }
