@@ -7,6 +7,8 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 
+require("solidity-coverage");
+
 dotenv.config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -226,7 +228,6 @@ const config: HardhatUserConfig = {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
-  // plugins: ["solidity-coverage"],
   etherscan: {
     apiKey: {
       mainnet: process.env.ETHERSCAN_API_KEY,
