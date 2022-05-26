@@ -27,6 +27,14 @@ contract RewardStrategy {
         );
     }
 
+    function getRewardPerBlockAtTimestamp(uint256 timestamp)
+        public
+        view
+        returns (uint256)
+    {
+        return rewardPoints[getEpoch(timestamp)].amount;
+    }
+
     function getEpoch(uint256 timestamp) public view returns (uint256) {
         uint256 first;
         uint256 last = lastEpoch;

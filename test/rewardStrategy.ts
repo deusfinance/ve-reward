@@ -64,4 +64,11 @@ describe("RewardStrategy", () => {
     let epoch = await rewardStrategy.getEpoch(BigNumber.from(timestamp));
     expect(epoch).to.eq(BigNumber.from(2));
   });
+  it("should return correct reward per block based on timestamp", async () => {
+    let currentTimestamp = await getCurrentTimeStamp();
+    let rpb = await rewardStrategy.getRewardPerBlockAtTimestamp(
+      currentTimestamp
+    );
+    expect(rpb).eq(BigNumber.from(2500)); // epoch 4
+  });
 });
