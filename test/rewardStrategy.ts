@@ -64,6 +64,7 @@ describe("RewardStrategy", () => {
     expect(rpb).eq(BigNumber.from(2500)); // epoch 4
   });
   it("should return reward points between two timestamps", async () => {
+    await increaseTime(100);
     let endTimestamp = await getCurrentTimeStamp();
     let startTimestamp = endTimestamp - 1000;
     let rewardPoints = await rewardStrategy.getRewardPointsBetweenTimestamps(
@@ -72,5 +73,14 @@ describe("RewardStrategy", () => {
     );
     expect(rewardPoints[0].amount).to.eq(1500); // epoch 3
     expect(rewardPoints[1].amount).to.eq(2500); // epoch 4
+  });
+  it("should return the correct reward amount between two timestamps", async () => {
+    let endTimestamp = await getCurrentTimeStamp();
+    let startTimestamp = endTimestamp - 1000;
+    let rewardAmount = await rewardStrategy.getRewardAmount(
+      startTimestamp,
+      endTimestamp
+    );
+    expect(rewardAmount).to.eq(BigNumber.from(1600000));
   });
 });

@@ -3,7 +3,6 @@
 
 pragma solidity 0.8.14;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -22,6 +21,7 @@ contract RewardStrategy is AccessControl {
     constructor(address admin) {
         require(admin != address(0), "RewardStrategy: ZERO_ADDRESS");
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        // todo: add first reward point with valid timestamp
     }
 
     function getLatestRewardPerBlock() public view returns (uint256) {
@@ -74,6 +74,31 @@ contract RewardStrategy is AccessControl {
             }
         }
         return 0;
+    }
+
+    function getRewardAmount(uint256 startTimestamp, uint256 endTimestamp)
+        external
+        view
+        returns (uint256)
+    {
+        RewardPoint[] memory _rewardPoints = getRewardPointsBetweenTimestamps(
+            startTimestamp,
+            endTimestamp
+        );
+        uint256 pointIndex = _rewardPoints.length;
+        uint256 reward;
+        uint256 timestamp;
+        while (endTimestamp > startTimestamp) {
+            pointIndex--;
+            timestamp = (_rewardPoints[pointIndex].timestamp > startTimestamp)
+                ? _rewardPoints[pointIndex].timestamp
+                : startTimestamp;
+            reward +=
+                (endTimestamp - timestamp) *
+                _rewardPoints[pointIndex].amount;
+            endTimestamp = timestamp;
+        }
+        return reward;
     }
 
     function emergencyWithdrawETH(address to, uint256 amount)

@@ -10,10 +10,12 @@ contract VeDist {
 
     mapping(address => uint256) public lastClaimPeriod; // user => last claim period
     uint256 internal constant WEEK = 7 days;
+    uint256 public startPeriod;
 
     constructor(address rewardStrategy_) {
         require(rewardStrategy_ != address(0), "VeDist: ZERO_ADDRESS");
         rewardStrategy = rewardStrategy_;
+        startPeriod = getActivePeriod();
     }
 
     function getActivePeriod() public view returns (uint256) {
