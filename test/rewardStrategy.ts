@@ -7,20 +7,13 @@ import {
   deployTokenTest,
 } from "../scripts/deployHelpers";
 import { RewardStrategy, VeDist } from "../typechain";
-import {
-  getActivePeriod,
-  getCurrentTimeStamp,
-  increaseTime,
-  setTimeToNextThursdayMidnight,
-} from "./timeUtils";
+import { getCurrentTimeStamp, increaseTime } from "./timeUtils";
 
 describe("RewardStrategy", () => {
   let rewardStrategy: RewardStrategy;
   let me: SignerWithAddress;
   before(async () => {
     [me] = await ethers.getSigners();
-  });
-  it("should deploy VeDist", async () => {
     rewardStrategy = await deployRewardStrategy(me.address);
   });
   it("reward should be zero", async () => {
