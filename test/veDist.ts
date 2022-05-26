@@ -51,38 +51,15 @@ describe("VeDist", () => {
     let latestPeriod = await veDist.getLatestPeriod();
     expect(latestPeriod).to.eq(_latestPeriod);
   });
-  it("should return users last claim period", async () => {
-    await setTimeToNextThursdayMidnight();
-    let claimPeriod = await getActivePeriod();
-    await mockVe.mock.isApprovedOrOwner
-      .withArgs(user1.address, ve1)
-      .returns(true);
-    await veDist.connect(user1).claim(ve1);
-    await setTimeToNextThursdayMidnight();
-    let lastClaimPeriod = await veDist.lastClaimPeriod(ve1);
-    user1LastClaimPeriod = lastClaimPeriod;
-    expect(claimPeriod).to.eq(await veDist.getLatestPeriod());
-    expect(claimPeriod).to.eq(lastClaimPeriod);
+  it("users last claim period should be start period", async () => {
+    let lastClaimPeriod = await veDist.getLastClaimPeriod(ve1);
+    let startPeriod = await veDist.startPeriod();
+    expect(lastClaimPeriod).eq(startPeriod);
   });
-  it("when claimed before", async () => {
-    // this means user 1 missed two claim periods
-    await setTimeToNextThursdayMidnight();
-    let p1 = await veDist.getLatestPeriod();
-    await setTimeToNextThursdayMidnight();
-    let p2 = await veDist.getLatestPeriod();
-
-    let pendingPeriods = await veDist.getPendingRewardPeriods(ve1);
-
-    expect(pendingPeriods.length).eq(2);
-    expect(p1.sub(week)).eq(user1LastClaimPeriod);
-    expect(p1).eq(pendingPeriods[0]);
-    expect(p2).eq(pendingPeriods[1]);
-  });
-
-  it("should return unclaimed reward at period", async () => {
+  it("should return correct reward at period", async () => {
     let latestPeriod = await veDist.getLatestPeriod();
     await mockRewardStrategy.mock.getRewardAmount
-      .withArgs(latestPeriod.sub(week), latestPeriod)
+      .withArgs(latestPeriod, latestPeriod.add(week))
       .returns(BigNumber.from(1000));
     await mockVe.mock.balanceOfNFTAt
       .withArgs(ve1, latestPeriod)
@@ -100,6 +77,7 @@ describe("VeDist", () => {
     let pendingPeriodsLength = BigNumber.from(latestPeriod)
       .sub(startPeriod)
       .div(week);
+
     let pendingPeriods = await veDist.getPendingRewardPeriods(ve2);
     expect(pendingPeriods.length).eq(pendingPeriodsLength);
   });
@@ -112,6 +90,10 @@ describe("VeDist", () => {
   });
   it("should get correct reward amount", async () => {
     // there are three pending periods for ve2
+    await setTimeToNextThursdayMidnight(); // one period
+    await setTimeToNextThursdayMidnight(); // two periods
+    await setTimeToNextThursdayMidnight(); // three period
+
     await mockRewardStrategy.mock.getRewardAmount.returns(BigNumber.from(1000));
     await mockVe.mock.balanceOfNFTAt.returns(BigNumber.from(20));
     await mockVe.mock.totalSupplyAtT.returns(BigNumber.from(100));

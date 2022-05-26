@@ -21,7 +21,12 @@ contract VeDist {
         );
         rewardStrategy = rewardStrategy_;
         ve = ve_;
-        startPeriod = getActivePeriod();
+        startPeriod = getLatestPeriod();
+    }
+
+    function getLastClaimPeriod(uint256 tokenId) public view returns (uint256) {
+        if (lastClaimPeriod[tokenId] == 0) return startPeriod;
+        return lastClaimPeriod[tokenId];
     }
 
     function getActivePeriod() public view returns (uint256) {
@@ -42,9 +47,7 @@ contract VeDist {
         returns (uint256[] memory periods)
     {
         uint256 latest = getLatestPeriod();
-        uint256 last = (lastClaimPeriod[tokenId] == 0)
-            ? startPeriod
-            : lastClaimPeriod[tokenId];
+        uint256 last = getLastClaimPeriod(tokenId);
         uint256 length = (latest - last) / WEEK;
         periods = new uint256[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -59,8 +62,8 @@ contract VeDist {
     {
         uint256 power = Ive(ve).balanceOfNFTAt(tokenId, period);
         uint256 reward = IRewardStrategy(rewardStrategy).getRewardAmount(
-            period - WEEK,
-            period
+            period,
+            period + WEEK
         );
         uint256 totalPower = Ive(ve).totalSupplyAtT(period);
         return (power * reward) / totalPower;
