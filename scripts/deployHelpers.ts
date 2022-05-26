@@ -16,9 +16,12 @@ async function deployRewardStrategy(admin: string): Promise<RewardStrategy> {
   return rewardStrategy;
 }
 
-async function deployVeDist(rewardStrategy: string): Promise<VeDist> {
+async function deployVeDist(
+  rewardStrategy: string,
+  ve: string
+): Promise<VeDist> {
   let factory = await ethers.getContractFactory("VeDist");
-  let veDist = await factory.deploy(rewardStrategy);
+  let veDist = await factory.deploy(rewardStrategy, ve);
   await veDist.deployed();
   return veDist;
 }
