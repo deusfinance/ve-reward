@@ -8,6 +8,11 @@ async function getCurrentTimeStamp(): Promise<number> {
   return blockBefore.timestamp;
 }
 
+async function getCurrentBlock(): Promise<number> {
+  const blockNumber = await ethers.provider.getBlockNumber();
+  return blockNumber;
+}
+
 async function getActivePeriod(): Promise<number> {
   return Math.floor((await getCurrentTimeStamp()) / week) * week;
 }
@@ -27,6 +32,7 @@ async function increaseTime(increaseAmount: number) {
 
 export {
   getCurrentTimeStamp,
+  getCurrentBlock,
   setTimeToNextThursdayMidnight,
   increaseTime,
   getActivePeriod,

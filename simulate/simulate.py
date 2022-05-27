@@ -6,14 +6,15 @@ import matplotlib.pyplot as plt
 
 def get_points():
     start = 33657905
-    diff_block = 86400
-    end = 33657905 + diff_block
-    days = 3
-    calls = []
+    end = 39131332
+    diff_block = 42300
+    days = (end - start) // diff_block
+    end = start + diff_block
     total_supply = []
     times = []
     for _ in range(days):
-        for time in range(start, end, 360):
+        calls = []
+        for time in range(start, end, 120):
             calls.append(
                 Call(
                     w3,

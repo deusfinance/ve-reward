@@ -11,7 +11,7 @@ interface Ive {
 
     function ownerOf(uint256) external view returns (address);
 
-    function totalSupplyAtT(uint256 t) external view returns (uint256);
+    function totalSupplyAt(uint256 blk) external view returns (uint256);
 
     function deposit_for(uint256 _tokenId, uint256 _value) external;
 }

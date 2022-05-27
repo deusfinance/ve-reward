@@ -3,23 +3,23 @@ pragma solidity 0.8.14;
 import "../interfaces/Ive.sol";
 
 contract VeTest is Ive {
-    function token() external view returns (address) {
+    function token() external pure returns (address) {
         return address(0);
     }
 
-    function balanceOfNFTAt(uint256, uint256) external view returns (uint256) {
+    function balanceOfNFTAt(uint256, uint256) external pure returns (uint256) {
         return 0;
     }
 
-    function isApprovedOrOwner(address, uint256) external view returns (bool) {
+    function isApprovedOrOwner(address, uint256) external pure returns (bool) {
         return true;
     }
 
-    function ownerOf(uint256) external view returns (address) {
+    function ownerOf(uint256) external pure returns (address) {
         return address(0);
     }
 
-    function totalSupplyAtT(uint256 t) external view returns (uint256) {
+    function totalSupplyAt(uint256) external pure returns (uint256) {
         return 0;
     }
 

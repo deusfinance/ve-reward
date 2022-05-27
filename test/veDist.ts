@@ -5,14 +5,17 @@ import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 import { deployTokenTest, deployVeDist } from "../scripts/deployHelpers";
 import {
+  IDEUS__factory,
   RewardStrategy,
   RewardStrategy__factory,
+  Utils__factory,
   VeDist,
   VeTest,
   VeTest__factory,
 } from "../typechain";
 import {
   getActivePeriod,
+  getCurrentBlock,
   getCurrentTimeStamp,
   increaseTime,
   setTimeToNextThursdayMidnight,
@@ -22,6 +25,8 @@ describe("VeDist", () => {
   let veDist: VeDist;
   let mockRewardStrategy: MockContract;
   let mockVe: MockContract;
+  let mockDeus: MockContract;
+  let mockUtils: MockContract;
 
   let me: SignerWithAddress;
   let user1: SignerWithAddress;
@@ -40,10 +45,18 @@ describe("VeDist", () => {
       me,
       RewardStrategy__factory.abi
     );
+    mockDeus = await deployMockContract(me, IDEUS__factory.abi);
+    mockUtils = await deployMockContract(me, Utils__factory.abi);
     mockVe = await deployMockContract(me, VeTest__factory.abi);
-    veDist = await deployVeDist(mockRewardStrategy.address, mockVe.address);
+    veDist = await deployVeDist(
+      mockRewardStrategy.address,
+      mockVe.address,
+      mockDeus.address,
+      mockUtils.address
+    );
 
     await mockVe.mock.deposit_for.returns();
+    await mockDeus.mock.mint.returns();
   });
   it("should get latest claim period", async () => {
     let activePeriod = await getActivePeriod();
@@ -58,16 +71,20 @@ describe("VeDist", () => {
   });
   it("should return correct reward at period", async () => {
     let latestPeriod = await veDist.getLatestPeriod();
+    // let currentTimeStamp = await getCurrentTimeStamp();
+    // let diffTimestamp = BigNumber.from(currentTimeStamp).sub(latestPeriod);
     await mockRewardStrategy.mock.getRewardAmount
       .withArgs(latestPeriod, latestPeriod.add(week))
       .returns(BigNumber.from(1000));
     await mockVe.mock.balanceOfNFTAt
       .withArgs(ve1, latestPeriod)
       .returns(BigNumber.from(10));
-    await mockVe.mock.totalSupplyAtT
+    await mockVe.mock.totalSupplyAt
       .withArgs(latestPeriod)
       .returns(BigNumber.from(100));
-
+    await mockUtils.mock.getBlockNumberAt
+      .withArgs(latestPeriod)
+      .returns(latestPeriod);
     let share = await veDist.getShareAt(ve1, latestPeriod);
     expect(share).eq(BigNumber.from(100));
   });
@@ -96,7 +113,8 @@ describe("VeDist", () => {
 
     await mockRewardStrategy.mock.getRewardAmount.returns(BigNumber.from(1000));
     await mockVe.mock.balanceOfNFTAt.returns(BigNumber.from(20));
-    await mockVe.mock.totalSupplyAtT.returns(BigNumber.from(100));
+    await mockVe.mock.totalSupplyAt.returns(BigNumber.from(100));
+    await mockUtils.mock.getBlockNumberAt.returns(0);
     let pendingRewards = await veDist.getPendingRewardsTimes(ve2, 3);
     expect(pendingRewards).eq(600);
   });
@@ -104,12 +122,13 @@ describe("VeDist", () => {
     // there is one pending period for ve2
     await setTimeToNextThursdayMidnight(); // one period
 
+    await mockDeus.mock.approve.returns(true);
     await mockVe.mock.isApprovedOrOwner
       .withArgs(user2.address, ve2)
       .returns(true);
     await mockRewardStrategy.mock.getRewardAmount.returns(BigNumber.from(1000));
     await mockVe.mock.balanceOfNFTAt.returns(BigNumber.from(20));
-    await mockVe.mock.totalSupplyAtT.returns(BigNumber.from(100));
+    await mockVe.mock.totalSupplyAt.returns(BigNumber.from(100));
     await veDist.connect(user2).claim(ve2);
     let pendingPeriods = await veDist.getPendingRewardPeriods(ve2);
     expect(pendingPeriods.length).eq(0);

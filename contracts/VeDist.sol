@@ -4,23 +4,34 @@
 pragma solidity 0.8.14;
 
 import "./interfaces/IRewardStrategy.sol";
+import "./interfaces/IUtils.sol";
+import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 import "hardhat/console.sol";
 
 contract VeDist {
     address public rewardStrategy;
+    address public deusToken;
+    address public utils;
     address public ve;
     mapping(uint256 => uint256) public lastClaimPeriod; // user => last claim period
     uint256 internal constant WEEK = 7 days;
     uint256 public startPeriod;
 
-    constructor(address rewardStrategy_, address ve_) {
+    constructor(
+        address rewardStrategy_,
+        address ve_,
+        address deusToken_,
+        address utils_
+    ) {
         require(
             rewardStrategy_ != address(0) && ve_ != address(0),
             "VeDist: ZERO_ADDRESS"
         );
         rewardStrategy = rewardStrategy_;
         ve = ve_;
+        deusToken = deusToken_;
+        utils = utils_;
         startPeriod = getLatestPeriod();
     }
 
@@ -65,7 +76,8 @@ contract VeDist {
             period,
             period + WEEK
         );
-        uint256 totalPower = Ive(ve).totalSupplyAtT(period);
+        uint256 blockNumber = IUtils(utils).getBlockNumberAt(period);
+        uint256 totalPower = Ive(ve).totalSupplyAt(blockNumber);
         return (power * reward) / totalPower;
     }
 
@@ -85,6 +97,12 @@ contract VeDist {
         return rewards;
     }
 
+    function _sendReward(uint256 tokenId, uint256 rewards) internal {
+        IDEUS(deusToken).mint(address(this), rewards);
+        require(IDEUS(deusToken).approve(ve, rewards), "VeDist: NOT_APPROVED");
+        Ive(ve).deposit_for(tokenId, rewards);
+    }
+
     function claimTimes(uint256 tokenId, uint256 times) public {
         require(
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
@@ -92,7 +110,7 @@ contract VeDist {
         );
         lastClaimPeriod[tokenId] = getLastClaimPeriod(tokenId) + times * WEEK;
         uint256 rewards = getPendingRewardsTimes(tokenId, times);
-        Ive(ve).deposit_for(tokenId, rewards);
+        _sendReward(tokenId, rewards);
     }
 
     function claim(uint256 tokenId) public {
