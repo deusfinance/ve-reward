@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.14;
 
-struct LockedBalance {
-    int128 amount;
-    uint256 end;
-}
-
 interface Ive {
+    struct LockedBalance {
+        int128 amount;
+        uint256 end;
+    }
+
     function token() external view returns (address);
 
     function balanceOfNFTAt(uint256, uint256) external view returns (uint256);

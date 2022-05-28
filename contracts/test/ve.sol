@@ -24,4 +24,14 @@ contract VeTest is Ive {
     }
 
     function deposit_for(uint256 _tokenId, uint256 _value) public {}
+
+    function locked(uint256) external view returns (LockedBalance memory) {}
+
+    function locked__end(uint256) external view returns (uint256) {}
+
+    function user_point_history__ts(uint256 tokenId, uint256 _idx)
+        external
+        view
+        returns (uint256)
+    {}
 }
