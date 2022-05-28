@@ -23,16 +23,16 @@ describe("RewardStrategyV2", async () => {
     );
   });
   it("should validate initial state", async () => {
-    let maxApr_ = await aprStrategy.maxApr();
+    let maxApr_ = await aprStrategy.getMaxApr();
     expect(maxApr_).eq(1e6);
   });
   it("non-setter role cannot set apr", async () => {
-    let setApr = aprStrategy.connect(user).setParams(maxApr, veMock.address);
+    let setApr = aprStrategy.connect(user).setMaxApr(maxApr);
     await expect(setApr).to.be.reverted;
   });
   it("should update params if user has setter role", async () => {
-    await aprStrategy.setParams(maxApr, veMock.address);
-    let maxApr_ = await aprStrategy.maxApr();
+    await aprStrategy.setMaxApr(maxApr);
+    let maxApr_ = await aprStrategy.getMaxApr();
     expect(maxApr).eq(maxApr_);
   });
   it("it should return users apr", async () => {
