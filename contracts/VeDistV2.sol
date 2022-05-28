@@ -8,11 +8,9 @@ import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 
 contract VeDistV2 {
-    address public ve;
     address public rewardStrategy;
     address public deus;
-    uint256 public constant YEAR = 365 * 86400;
-    uint256 public constant APR_DECIMALS = 1e6;
+    address public ve;
     mapping(uint256 => uint256) public rewardBalance;
     mapping(uint256 => uint256) public lastClaim;
 
@@ -52,20 +50,17 @@ contract VeDistV2 {
         Ive(ve).deposit_for(tokenId, reward);
     }
 
-    function getRewardAmount(uint256 tokenId) public view returns (uint256) {
-        uint256 lastClaimTimestamp = getLastClaimTimestamp(tokenId);
-        uint256 apr = IRewardStrategyV2(rewardStrategy).getApr(tokenId);
-        uint256 lockedBalance = getLockedBalance(tokenId);
-        uint256 reward = ((block.timestamp - lastClaimTimestamp) *
-            apr *
-            lockedBalance) / (YEAR * APR_DECIMALS);
-        return reward;
-    }
-
     function claim(uint256 tokenId) external {
-        lastClaim[tokenId] = block.timestamp;
-        uint256 reward = getRewardAmount(tokenId);
+        uint256 startTimestamp = getLastClaimTimestamp(tokenId);
+        uint256 lockedBalance = getLockedBalance(tokenId);
+        uint256 reward = IRewardStrategyV2(rewardStrategy).getPendingReward(
+            tokenId,
+            startTimestamp,
+            block.timestamp,
+            lockedBalance
+        );
         rewardBalance[tokenId] += reward;
+        lastClaim[tokenId] = block.timestamp;
         _sendReward(tokenId, reward);
         emit Claim(tokenId, reward);
     }

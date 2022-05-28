@@ -6,6 +6,7 @@ import { ethers, network } from "hardhat";
 import { deployTokenTest, deployVeDistV2 } from "../scripts/deployHelpers";
 import {
   IDEUS__factory,
+  IRewardStrategyV2__factory,
   RewardStrategy,
   RewardStrategyV2__factory,
   RewardStrategy__factory,
@@ -45,7 +46,7 @@ describe("VeDistV2", () => {
     mockDeus = await deployMockContract(me, IDEUS__factory.abi);
     mockRewardStrategy = await deployMockContract(
       me,
-      RewardStrategyV2__factory.abi
+      IRewardStrategyV2__factory.abi
     );
     veDist = await deployVeDistV2(
       mockVe.address,
@@ -66,20 +67,23 @@ describe("VeDistV2", () => {
   });
   it("should claim", async () => {
     let currentTimeStamp = await getCurrentTimeStamp();
+    await mockVe.mock.locked.returns([
+      BigNumber.from(1000),
+      BigNumber.from(currentTimeStamp),
+    ]);
+    await mockVe.mock.user_point_history__ts.returns(currentTimeStamp);
     await increaseTime(365 * 86400);
-    await mockRewardStrategy.mock.getApr
-      .withArgs(ve1)
-      .returns(BigNumber.from(1000000));
-    await mockVe.mock.locked
-      .withArgs(ve1)
-      .returns([BigNumber.from(1000), BigNumber.from(2 * 365 * 86400)]);
-    await mockVe.mock.user_point_history__ts
-      .withArgs(ve1, 1)
-      .returns(BigNumber.from(currentTimeStamp));
-    let reward = await veDist.getRewardAmount(ve1);
-    expect(reward).eq(BigNumber.from(1000));
+    let startTimestamp = await veDist.getLastClaimTimestamp(ve1);
+    let lockedBalance = await veDist.getLockedBalance(ve1);
+    currentTimeStamp = await getCurrentTimeStamp();
+    await mockRewardStrategy.mock.getPendingReward
+      .withArgs(ve1, startTimestamp, currentTimeStamp + 2, lockedBalance)
+      .returns(BigNumber.from(1000));
     await veDist.connect(user1).claim(ve1);
-    reward = await veDist.getRewardAmount(ve1);
-    expect(reward).eq(BigNumber.from(0));
+    let timestamp = await getCurrentTimeStamp();
+    let lastClaim = await veDist.lastClaim(ve1);
+    let rewardBalance = await veDist.rewardBalance(ve1);
+    expect(rewardBalance).eq(BigNumber.from(1000));
+    expect(lastClaim).eq(timestamp);
   });
 });
