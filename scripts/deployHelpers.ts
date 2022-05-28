@@ -1,6 +1,12 @@
 import { BigNumber, utils } from "ethers";
 import { ethers } from "hardhat";
-import { RewardStrategy, TokenTest, VeDist, Utils } from "../typechain";
+import {
+  RewardStrategy,
+  TokenTest,
+  VeDist,
+  Utils,
+  RewardStrategyV2,
+} from "../typechain";
 
 async function deployTokenTest(): Promise<TokenTest> {
   let tokenFactory = await ethers.getContractFactory("TokenTest");
@@ -35,4 +41,20 @@ async function deployVeDist(
   return veDist;
 }
 
-export { deployTokenTest, deployRewardStrategy, deployVeDist, deployUtils };
+async function deployRewardStrategyV2(
+  maxApr: BigNumber,
+  admin: string
+): Promise<RewardStrategyV2> {
+  let factory = await ethers.getContractFactory("RewardStrategyV2");
+  let aprStrategy = await factory.deploy(maxApr, admin);
+  await aprStrategy.deployed();
+  return aprStrategy;
+}
+
+export {
+  deployTokenTest,
+  deployRewardStrategy,
+  deployVeDist,
+  deployUtils,
+  deployRewardStrategyV2,
+};
