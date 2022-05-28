@@ -50,18 +50,18 @@ contract VeDistV2 {
         Ive(ve).deposit_for(tokenId, reward);
     }
 
-    function claim(uint256 tokenId) external {
+    function claim(uint256 tokenId, uint256 times) public {
         uint256 startTimestamp = getLastClaimTimestamp(tokenId);
-        uint256 lockedBalance = getLockedBalance(tokenId);
-        uint256 reward = IRewardStrategyV2(rewardStrategy).getPendingReward(
-            tokenId,
-            startTimestamp,
-            block.timestamp,
-            lockedBalance
-        );
+        (uint256 reward, uint256 epoch) = IRewardStrategyV2(rewardStrategy)
+            .getPendingReward(tokenId, startTimestamp, times);
         rewardBalance[tokenId] += reward;
-        lastClaim[tokenId] = block.timestamp;
+        lastClaim[tokenId] = epoch;
         _sendReward(tokenId, reward);
         emit Claim(tokenId, reward);
+    }
+
+    function claim(tokenId) external {
+        uint256 times; // todo: calculate times
+        claim(tokenId, times);
     }
 }
