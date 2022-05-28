@@ -6,7 +6,7 @@ import { ethers } from "hardhat";
 import { deployRewardStrategyV2 } from "../scripts/deployHelpers";
 import { RewardStrategyV2, VeTest__factory } from "../typechain";
 
-describe("APRReward", async () => {
+describe("RewardStrategyV2", async () => {
   let aprStrategy: RewardStrategyV2;
   let veMock: MockContract;
   let ve1: BigNumber = BigNumber.from(1);

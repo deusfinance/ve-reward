@@ -6,6 +6,7 @@ import {
   VeDist,
   Utils,
   RewardStrategyV2,
+  VeDistV2,
 } from "../typechain";
 
 async function deployTokenTest(): Promise<TokenTest> {
@@ -41,6 +42,17 @@ async function deployVeDist(
   return veDist;
 }
 
+async function deployVeDistV2(
+  ve: string,
+  rewardStrategy: string,
+  deus: string
+): Promise<VeDistV2> {
+  let factory = await ethers.getContractFactory("VeDistV2");
+  let veDist = await factory.deploy(ve, rewardStrategy, deus);
+  await veDist.deployed();
+  return veDist;
+}
+
 async function deployRewardStrategyV2(
   maxApr: BigNumber,
   veAddress: string,
@@ -57,4 +69,5 @@ export {
   deployVeDist,
   deployUtils,
   deployRewardStrategyV2,
+  deployVeDistV2,
 };
