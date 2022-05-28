@@ -20,7 +20,7 @@ interface Ive {
 
     function deposit_for(uint256 _tokenId, uint256 _value) external;
 
-    function locked(uint256) external view returns (Lockedbalance memory);
+    function locked(uint256) external view returns (LockedBalance memory);
 
     function locked__end(uint256) external view returns (uint256);
 
