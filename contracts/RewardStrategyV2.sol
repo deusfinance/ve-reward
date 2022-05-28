@@ -40,5 +40,6 @@ contract RewardStrategyV2 is AccessControl {
     {
         require(ve_ != address(0), "RewardStrategyV2: ZERO_ADDRESS");
         maxApr = maxApr_;
+        ve = ve_;
     }
 }
