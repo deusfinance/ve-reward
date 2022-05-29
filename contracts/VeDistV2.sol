@@ -50,7 +50,7 @@ contract VeDistV2 {
         Ive(ve).deposit_for(tokenId, reward);
     }
 
-    function claim(uint256 tokenId, uint256 times) public {
+    function _claim(uint256 tokenId, uint256 times) public {
         uint256 startTimestamp = getLastClaimTimestamp(tokenId);
         (uint256 reward, uint256 epoch) = IRewardStrategyV2(rewardStrategy)
             .getPendingReward(tokenId, startTimestamp, times);
@@ -60,8 +60,12 @@ contract VeDistV2 {
         emit Claim(tokenId, reward);
     }
 
-    function claim(tokenId) external {
-        uint256 times; // todo: calculate times
-        claim(tokenId, times);
+    function claim(uint256 tokenId) external {
+        uint256 startTime = getLastClaimTimestamp(tokenId);
+        uint256 aprsLength = IRewardStrategyV2(rewardStrategy).aprsLength();
+        uint256 pendingStartIndex = IRewardStrategyV2(rewardStrategy)
+            .getPendingStartIndex(startTime);
+        uint256 times = aprsLength - pendingStartIndex;
+        _claim(tokenId, times);
     }
 }

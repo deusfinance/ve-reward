@@ -54,12 +54,11 @@ async function deployVeDistV2(
 }
 
 async function deployRewardStrategyV2(
-  maxApr: BigNumber,
   veAddress: string,
   admin: string
 ): Promise<RewardStrategyV2> {
   let factory = await ethers.getContractFactory("RewardStrategyV2");
-  let aprStrategy = await factory.deploy(maxApr, veAddress, admin);
+  let aprStrategy = await factory.deploy(admin, veAddress);
   await aprStrategy.deployed();
   return aprStrategy;
 }

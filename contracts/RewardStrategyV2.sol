@@ -27,8 +27,23 @@ contract RewardStrategyV2 is AccessControl {
         ve = ve_;
     }
 
+    function aprsLength() public view returns (uint256) {
+        return aprs.length;
+    }
+
     function getEpoch(uint256 timestamp) public pure returns (uint256) {
         return (timestamp / WEEK) * WEEK;
+    }
+
+    function getPendingStartIndex(uint256 startTime)
+        public
+        pure
+        returns (uint256)
+    {
+        return
+            (startTime < START_WEEK)
+                ? 1
+                : ((startTime - START_WEEK) / WEEK) + 2;
     }
 
     function getPendingReward(
@@ -36,9 +51,7 @@ contract RewardStrategyV2 is AccessControl {
         uint256 startTime,
         uint256 times
     ) external view returns (uint256, uint256) {
-        uint256 index = (startTime < START_WEEK)
-            ? 1
-            : ((startTime - START_WEEK) / WEEK) + 2;
+        uint256 index = getPendingStartIndex(startTime);
         uint256 reward;
         uint256 apr;
         uint256 power;
@@ -52,7 +65,8 @@ contract RewardStrategyV2 is AccessControl {
                 (apr * power * (epoch + WEEK - startTime)) /
                 (DECIMALS * WEEK);
         }
-        for (uint256 i = index; i < index + times; i++) {
+        uint256 length = min(index + times, aprs.length);
+        for (uint256 i = index; i < length; i++) {
             apr = getAPR(tokenId, aprs[i]); // apr at the end of the week
             power = Ive(ve).balanceOfNFTAt(
                 tokenId,
@@ -75,5 +89,9 @@ contract RewardStrategyV2 is AccessControl {
     {
         uint256 lockedTime = Ive(ve).locked__end(tokenId);
         return (maxAPR * lockedTime) / MAX_LOCK_TIME;
+    }
+
+    function min(uint256 a, uint256 b) public pure returns (uint256) {
+        return a < b ? a : b;
     }
 }
