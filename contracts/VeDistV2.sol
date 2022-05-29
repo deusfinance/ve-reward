@@ -7,6 +7,8 @@ import "./interfaces/IRewardStrategyV2.sol";
 import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 
+import "hardhat/console.sol";
+
 contract VeDistV2 {
     address public rewardStrategy;
     address public deus;
@@ -51,12 +53,17 @@ contract VeDistV2 {
     }
 
     function _claim(uint256 tokenId, uint256 times) public {
+        require(
+            Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
+            "VeDist: NOT_APPROVED"
+        );
+        console.log(times);
         uint256 startTimestamp = getLastClaimTimestamp(tokenId);
         (uint256 reward, uint256 epoch) = IRewardStrategyV2(rewardStrategy)
             .getPendingReward(tokenId, startTimestamp, times);
         rewardBalance[tokenId] += reward;
         lastClaim[tokenId] = epoch;
-        _sendReward(tokenId, reward);
+        if (reward > 0) _sendReward(tokenId, reward);
         emit Claim(tokenId, reward);
     }
 

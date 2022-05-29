@@ -2,27 +2,15 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { deployMockContract, MockContract } from "ethereum-waffle";
 import { BigNumber } from "ethers";
-import { ethers, network } from "hardhat";
-import { deployTokenTest, deployVeDistV2 } from "../scripts/deployHelpers";
+import { ethers } from "hardhat";
+import { deployVeDistV2 } from "../scripts/deployHelpers";
 import {
   IDEUS__factory,
   IRewardStrategyV2__factory,
-  RewardStrategy,
-  RewardStrategyV2__factory,
-  RewardStrategy__factory,
-  Utils__factory,
-  VeDist,
   VeDistV2,
-  VeTest,
   VeTest__factory,
 } from "../typechain";
-import {
-  getActivePeriod,
-  getCurrentBlock,
-  getCurrentTimeStamp,
-  increaseTime,
-  setTimeToNextThursdayMidnight,
-} from "./timeUtils";
+import { getCurrentTimeStamp } from "./timeUtils";
 
 describe("VeDistV2", () => {
   let veDist: VeDistV2;
@@ -65,5 +53,26 @@ describe("VeDistV2", () => {
     let lastClaim = await veDist.getLastClaimTimestamp(ve1);
     expect(currentTimeStamp).eq(lastClaim);
   });
-  it("should claim", async () => {});
+  it("should claim", async () => {
+    let epoch = BigNumber.from(1000);
+    let reward = BigNumber.from(2000);
+    let startTime = await veDist.getLastClaimTimestamp(ve1);
+    let currentTimeStamp = await getCurrentTimeStamp();
+    await mockVe.mock.user_point_history__ts
+      .withArgs(ve1, 1)
+      .returns(BigNumber.from(currentTimeStamp));
+    await mockVe.mock.isApprovedOrOwner.returns(true);
+
+    await mockRewardStrategy.mock.getPendingReward.returns([reward, epoch]);
+
+    await mockRewardStrategy.mock.aprsLength.returns(BigNumber.from(2));
+    await mockRewardStrategy.mock.getPendingStartIndex
+      .withArgs(startTime)
+      .returns(BigNumber.from(0));
+    await veDist.connect(user1).claim(ve1);
+    let lastClaim = await veDist.getLastClaimTimestamp(ve1);
+    let rewardBalance = await veDist.rewardBalance(ve1);
+    expect(lastClaim).eq(epoch);
+    expect(rewardBalance).eq(reward);
+  });
 });
