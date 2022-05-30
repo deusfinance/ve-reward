@@ -1,6 +1,13 @@
 import { BigNumber, utils } from "ethers";
 import { ethers } from "hardhat";
-import { RewardStrategy, TokenTest, VeDist, Utils } from "../typechain";
+import {
+  RewardStrategy,
+  TokenTest,
+  VeDist,
+  Utils,
+  RewardStrategyV2,
+  VeDistV2,
+} from "../typechain";
 
 async function deployTokenTest(): Promise<TokenTest> {
   let tokenFactory = await ethers.getContractFactory("TokenTest");
@@ -35,4 +42,32 @@ async function deployVeDist(
   return veDist;
 }
 
-export { deployTokenTest, deployRewardStrategy, deployVeDist, deployUtils };
+async function deployVeDistV2(
+  admin: string,
+  ve: string,
+  rewardStrategy: string,
+  deus: string
+): Promise<VeDistV2> {
+  let factory = await ethers.getContractFactory("VeDistV2");
+  let veDist = await factory.deploy(admin, ve, rewardStrategy, deus);
+  await veDist.deployed();
+  return veDist;
+}
+
+async function deployRewardStrategyV2(
+  admin: string,
+  veAddress: string
+): Promise<RewardStrategyV2> {
+  let factory = await ethers.getContractFactory("RewardStrategyV2");
+  let aprStrategy = await factory.deploy(admin, veAddress);
+  await aprStrategy.deployed();
+  return aprStrategy;
+}
+export {
+  deployTokenTest,
+  deployRewardStrategy,
+  deployVeDist,
+  deployUtils,
+  deployRewardStrategyV2,
+  deployVeDistV2,
+};
