@@ -22,10 +22,6 @@ describe("VeDistV2", () => {
   let mockVe: MockContract;
   let mockDeus: MockContract;
   let mockRewardStrategy: MockContract;
-
-  let user1LastClaimPeriod: BigNumber = BigNumber.from(0);
-  let user2LastClaimPeriod: BigNumber = BigNumber.from(0);
-
   let week = 86400 * 7;
 
   before(async () => {
