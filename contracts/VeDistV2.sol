@@ -55,6 +55,17 @@ contract VeDistV2 {
         return aprsLength - pendingStartIndex;
     }
 
+    function getPendingReward(uint256 tokenId) external view returns (uint256) {
+        uint256 times = getPendingRewardsLength(tokenId);
+        uint256 startTimestamp = getLastClaimTimestamp(tokenId);
+        (uint256 reward, ) = IRewardStrategyV2(rewardStrategy).getPendingReward(
+            tokenId,
+            startTimestamp,
+            times
+        );
+        return reward;
+    }
+
     function _claim(uint256 tokenId, uint256 times) public {
         require(
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
