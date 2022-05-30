@@ -154,8 +154,9 @@ const config: HardhatUserConfig = {
       gasMultiplier: 1.2,
     },
     fantom: {
-      url: `https://rpc.ftm.tools`,
+      url: `https://rpc.fantom.network`,
       accounts: [
+        process.env.TESTER!,
         process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
         process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
         process.env.DEI_DEPLOYER_PRIVATE_KEY!,
@@ -163,8 +164,8 @@ const config: HardhatUserConfig = {
         process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
       ],
       chainId: 250,
-      gas: "auto",
-      gasPrice: 400100000000, //500.1 Gwei
+      // gas: "auto",
+      gasPrice: 10000000000, // 10 Gwei
       gasMultiplier: 1.2,
     },
     bsctest: {
