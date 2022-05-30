@@ -32,8 +32,8 @@ async function deployRewardStrategy(): Promise<RewardStrategyV2> {
 }
 
 async function deployVeDist(): Promise<VeDistV2> {
-  let rewardStrategyAddress = await (await deployRewardStrategy()).address;
-  // let rewardStrategyAddress = "0x392ee567631f79c610656bcf12cdea39afdba54b";
+  // let rewardStrategyAddress = await (await deployRewardStrategy()).address;
+  let rewardStrategyAddress = "0x78db4155463527A7B1B4d3061325E0d99b62EEBb";
 
   let admin: SignerWithAddress;
   admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_ADDRESS!);

@@ -79,7 +79,6 @@ contract VeDistV2 is AccessControl {
     }
 
     function _sendReward(uint256 tokenId, uint256 reward) internal {
-        IDEUS(deus).mint(address(this), reward);
         IDEUS(deus).approve(ve, reward);
         Ive(ve).deposit_for(tokenId, reward);
     }

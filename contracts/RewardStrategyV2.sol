@@ -32,15 +32,6 @@ contract RewardStrategyV2 is AccessControl {
         return (block.timestamp - START_WEEK) / WEEK + 1;
     }
 
-    function getAPR(uint256 tokenId, uint256 maxAPR)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 lockedTime = Ive(ve).locked__end(tokenId);
-        return (maxAPR * lockedTime) / MAX_LOCK_TIME;
-    }
-
     function getAprAt(uint256 index) public view returns (uint256) {
         if (index < aprs.length) {
             return aprs[index];
@@ -77,27 +68,24 @@ contract RewardStrategyV2 is AccessControl {
         require(times > 0, "RewardStrategyV2: TIMES_ZERO");
         uint256 index = getPendingStartIndex(startTime);
         uint256 reward;
-        uint256 apr;
         uint256 power;
         uint256 epoch = getEpoch(startTime);
 
         // when user comes between epochs
         if (startTime > epoch) {
             power = getPowerAt(tokenId, startTime);
-            apr = getAPR(tokenId, getAprAt(index - 1));
             reward +=
-                (apr * power * (epoch + WEEK - startTime)) /
+                (getAprAt(index - 1) * power * (epoch + WEEK - startTime)) /
                 (DECIMALS * WEEK);
             times--;
         }
         uint256 length = min(index + times, aprsLength());
         for (uint256 i = index; i < length; i++) {
-            apr = getAPR(tokenId, getAprAt(i)); // apr at the end of the week
             power = getPowerAt(
                 tokenId,
                 START_WEEK + WEEK * (i - 1) // voting power at the start of the week
             );
-            reward += (apr * power) / DECIMALS; // apr sould be in week (wpr)
+            reward += (getAprAt(i) * power) / DECIMALS; // apr sould be in week (wpr)
         }
 
         return (reward, epoch);
