@@ -7,8 +7,6 @@ import "./interfaces/IRewardStrategyV2.sol";
 import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 
-import "hardhat/console.sol";
-
 contract VeDistV2 {
     address public rewardStrategy;
     address public deus;
@@ -39,17 +37,22 @@ contract VeDistV2 {
                 : lastClaim[tokenId];
     }
 
-    function getLockedBalance(uint256 tokenId) public view returns (uint256) {
-        uint256 veDeusBalance = uint256(
-            uint128(Ive(ve).locked(tokenId).amount)
-        );
-        return veDeusBalance - rewardBalance[tokenId];
-    }
-
     function _sendReward(uint256 tokenId, uint256 reward) internal {
         IDEUS(deus).mint(address(this), reward);
         IDEUS(deus).approve(ve, reward);
         Ive(ve).deposit_for(tokenId, reward);
+    }
+
+    function getPendingRewardsLength(uint256 tokenId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 startTime = getLastClaimTimestamp(tokenId);
+        uint256 aprsLength = IRewardStrategyV2(rewardStrategy).aprsLength();
+        uint256 pendingStartIndex = IRewardStrategyV2(rewardStrategy)
+            .getPendingStartIndex(startTime);
+        return aprsLength - pendingStartIndex;
     }
 
     function _claim(uint256 tokenId, uint256 times) public {
@@ -57,7 +60,6 @@ contract VeDistV2 {
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
             "VeDist: NOT_APPROVED"
         );
-        console.log(times);
         uint256 startTimestamp = getLastClaimTimestamp(tokenId);
         (uint256 reward, uint256 epoch) = IRewardStrategyV2(rewardStrategy)
             .getPendingReward(tokenId, startTimestamp, times);
@@ -68,11 +70,7 @@ contract VeDistV2 {
     }
 
     function claim(uint256 tokenId) external {
-        uint256 startTime = getLastClaimTimestamp(tokenId);
-        uint256 aprsLength = IRewardStrategyV2(rewardStrategy).aprsLength();
-        uint256 pendingStartIndex = IRewardStrategyV2(rewardStrategy)
-            .getPendingStartIndex(startTime);
-        uint256 times = aprsLength - pendingStartIndex;
+        uint256 times = getPendingRewardsLength(tokenId);
         _claim(tokenId, times);
     }
 }

@@ -5,7 +5,6 @@ pragma solidity 0.8.14;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/Ive.sol";
-import "hardhat/console.sol";
 
 contract RewardStrategyV2 is AccessControl {
     address public ve;
@@ -53,7 +52,6 @@ contract RewardStrategyV2 is AccessControl {
         view
         returns (uint256)
     {
-        console.log(tokenId, time);
         return Ive(ve).balanceOfNFTAt(tokenId, time);
     }
 
