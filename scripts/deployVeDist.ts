@@ -36,9 +36,10 @@ async function deployVeDist(): Promise<VeDistV2> {
   let rewardStrategyAddress = "0x392ee567631f79c610656bcf12cdea39afdba54b";
 
   let admin: SignerWithAddress;
-  admin = await ethers.getSigner(process.env.TESTER_ADDRESS!);
+  admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_PRIVATE_KEY!);
   let networkType = getNetworkType(network.name);
   let veDistArgs = [
+    networkConf[networkType!].admin,
     networkConf[networkType!].ve,
     rewardStrategyAddress,
     networkConf[networkType!].deus,

@@ -3,20 +3,25 @@
 
 pragma solidity 0.8.14;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IRewardStrategyV2.sol";
 import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 
-contract VeDistV2 {
+contract VeDistV2 is AccessControl {
     address public rewardStrategy;
     address public deus;
     address public ve;
-    mapping(uint256 => uint256) public rewardBalance;
     mapping(uint256 => uint256) public lastClaim;
 
     event Claim(uint256 tokenId, uint256 amount);
+    event SetRewardStrategy(
+        address oldRewardStrategy,
+        address newRewardStrategy
+    );
 
     constructor(
+        address admin,
         address ve_,
         address rewardStrategy_,
         address deus_
@@ -24,16 +29,8 @@ contract VeDistV2 {
         ve = ve_;
         rewardStrategy = rewardStrategy_;
         deus = deus_;
-    }
 
-    function claimAll(uint256[] memory tokenIds) external {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            claim(tokenIds[i]);
-        }
-    }
-
-    function claim(uint256 tokenId) public {
-        _claim(tokenId, getPendingRewardsLength(tokenId));
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
     }
 
     function getPendingRewardsLength(uint256 tokenId)
@@ -81,21 +78,38 @@ contract VeDistV2 {
         return (reward, epoch);
     }
 
+    function _sendReward(uint256 tokenId, uint256 reward) internal {
+        IDEUS(deus).mint(address(this), reward);
+        IDEUS(deus).approve(ve, reward);
+        Ive(ve).deposit_for(tokenId, reward);
+    }
+
     function _claim(uint256 tokenId, uint256 times) public {
         require(
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
             "VeDist: NOT_APPROVED"
         );
         (uint256 reward, uint256 epoch) = _getPendingReward(tokenId, times);
-        rewardBalance[tokenId] += reward;
         lastClaim[tokenId] = epoch;
         if (reward > 0) _sendReward(tokenId, reward);
         emit Claim(tokenId, reward);
     }
 
-    function _sendReward(uint256 tokenId, uint256 reward) internal {
-        IDEUS(deus).mint(address(this), reward);
-        IDEUS(deus).approve(ve, reward);
-        Ive(ve).deposit_for(tokenId, reward);
+    function claim(uint256 tokenId) public {
+        _claim(tokenId, getPendingRewardsLength(tokenId));
+    }
+
+    function claimAll(uint256[] memory tokenIds) external {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            _claim(tokenIds[i], getPendingRewardsLength(tokenIds[i]));
+        }
+    }
+
+    function setRewardStrategy(address rewardStrategy_)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        emit SetRewardStrategy(rewardStrategy, rewardStrategy_);
+        rewardStrategy = rewardStrategy_;
     }
 }

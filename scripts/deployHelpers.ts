@@ -43,12 +43,13 @@ async function deployVeDist(
 }
 
 async function deployVeDistV2(
+  admin: string,
   ve: string,
   rewardStrategy: string,
   deus: string
 ): Promise<VeDistV2> {
   let factory = await ethers.getContractFactory("VeDistV2");
-  let veDist = await factory.deploy(ve, rewardStrategy, deus);
+  let veDist = await factory.deploy(admin, ve, rewardStrategy, deus);
   await veDist.deployed();
   return veDist;
 }

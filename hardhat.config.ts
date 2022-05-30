@@ -156,7 +156,7 @@ const config: HardhatUserConfig = {
     fantom: {
       url: `https://rpc.fantom.network`,
       accounts: [
-        process.env.TESTER!,
+        // process.env.TESTER!,
         process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
         process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
         process.env.DEI_DEPLOYER_PRIVATE_KEY!,

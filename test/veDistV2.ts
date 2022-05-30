@@ -37,6 +37,7 @@ describe("VeDistV2", () => {
       IRewardStrategyV2__factory.abi
     );
     veDist = await deployVeDistV2(
+      me.address,
       mockVe.address,
       mockRewardStrategy.address,
       mockDeus.address
@@ -69,8 +70,6 @@ describe("VeDistV2", () => {
       .returns(BigNumber.from(0));
     await veDist.connect(user1).claim(ve1);
     let lastClaim = await veDist.getLastClaimTimestamp(ve1);
-    let rewardBalance = await veDist.rewardBalance(ve1);
     expect(lastClaim).eq(epoch);
-    expect(rewardBalance).eq(reward);
   });
 });
