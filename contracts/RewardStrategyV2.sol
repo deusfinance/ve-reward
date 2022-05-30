@@ -9,7 +9,6 @@ import "./interfaces/Ive.sol";
 contract RewardStrategyV2 is AccessControl {
     address public ve;
     uint256[] public aprs; // epoch index => max apr
-
     uint256 public constant MAX_LOCK_TIME = 4 * 365 * 86400;
     uint256 public constant START_WEEK = 1647475200; // Thursday, March 17, 2022 12:00:00 AM
     uint256 public constant WEEK = 7 * 86400;
@@ -28,7 +27,14 @@ contract RewardStrategyV2 is AccessControl {
     }
 
     function aprsLength() public view returns (uint256) {
-        return aprs.length;
+        return (block.timestamp - START_WEEK) / WEEK + 1;
+    }
+
+    function getAprAt(uint256 index) public view returns (uint256) {
+        if (index < aprs.length) {
+            return aprs[index];
+        }
+        return aprs[aprs.length - 1];
     }
 
     function getEpoch(uint256 timestamp) public pure returns (uint256) {
@@ -61,6 +67,7 @@ contract RewardStrategyV2 is AccessControl {
         uint256 startTime,
         uint256 times
     ) external view returns (uint256, uint256) {
+        require(times > 0, "RewardStrategyV2: TIMES_ZERO");
         uint256 index = getPendingStartIndex(startTime);
         uint256 reward;
         uint256 apr;
@@ -70,15 +77,15 @@ contract RewardStrategyV2 is AccessControl {
         // when user comes between epochs
         if (startTime > epoch) {
             power = getPowerAt(tokenId, startTime);
-            apr = getAPR(tokenId, aprs[index - 1]);
+            apr = getAPR(tokenId, getAprAt(index - 1));
             reward +=
                 (apr * power * (epoch + WEEK - startTime)) /
                 (DECIMALS * WEEK);
             times--;
         }
-        uint256 length = min(index + times, aprs.length);
+        uint256 length = min(index + times, aprsLength());
         for (uint256 i = index; i < length; i++) {
-            apr = getAPR(tokenId, aprs[i]); // apr at the end of the week
+            apr = getAPR(tokenId, getAprAt(i)); // apr at the end of the week
             power = getPowerAt(
                 tokenId,
                 START_WEEK + WEEK * (i - 1) // voting power at the start of the week

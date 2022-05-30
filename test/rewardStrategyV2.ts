@@ -38,9 +38,10 @@ describe("RewardStrategyV2", () => {
     await rewardStrategy.connect(me).setAPR(amount1);
     apr = await rewardStrategy.aprs(1);
     expect(apr).eq(amount1);
-    await rewardStrategy.connect(me).setAPR(amount1.mul(2));
-    apr = await rewardStrategy.aprs(2);
-    expect(apr).eq(amount1.mul(2));
+  });
+  it("should revert if times is zero", async () => {
+    let tx = rewardStrategy.getPendingReward(ve1, 0, 0);
+    await expect(tx).to.be.revertedWith("RewardStrategyV2: TIMES_ZERO");
   });
   it("should return correct pending reward", async () => {
     let startTime = startWeek.add(86400 * 3.5);
@@ -51,7 +52,16 @@ describe("RewardStrategyV2", () => {
     await mockVe.mock.balanceOfNFTAt
       .withArgs(ve1, startWeek.add(week))
       .returns(BigNumber.from(2000));
-    let a = await rewardStrategy.getPendingReward(ve1, startTime, 3);
-    expect(a[0]).eq(9);
+    await mockVe.mock.balanceOfNFTAt
+      .withArgs(ve1, startWeek.add(week.mul(2)))
+      .returns(BigNumber.from(2000));
+    await mockVe.mock.balanceOfNFTAt
+      .withArgs(ve1, startWeek.add(week.mul(3)))
+      .returns(BigNumber.from(2000));
+    await mockVe.mock.balanceOfNFTAt
+      .withArgs(ve1, startWeek.add(week.mul(4)))
+      .returns(BigNumber.from(2000));
+    let a = await rewardStrategy.getPendingReward(ve1, startTime, 5);
+    expect(a[0]).eq(17);
   });
 });
