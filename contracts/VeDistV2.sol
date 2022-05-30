@@ -4,11 +4,13 @@
 pragma solidity 0.8.14;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IRewardStrategyV2.sol";
-import "./interfaces/IDEUS.sol";
 import "./interfaces/Ive.sol";
 
 contract VeDistV2 is AccessControl {
+    using SafeERC20 for IERC20;
+
     address public rewardStrategy;
     address public deus;
     address public ve;
@@ -79,7 +81,7 @@ contract VeDistV2 is AccessControl {
     }
 
     function _sendReward(uint256 tokenId, uint256 reward) internal {
-        IDEUS(deus).approve(ve, reward);
+        IERC20(deus).safeApprove(ve, reward);
         Ive(ve).deposit_for(tokenId, reward);
     }
 
@@ -110,5 +112,13 @@ contract VeDistV2 is AccessControl {
     {
         emit SetRewardStrategy(rewardStrategy, rewardStrategy_);
         rewardStrategy = rewardStrategy_;
+    }
+
+    function withdrawERC20(
+        address token,
+        address recv,
+        uint256 amount
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        IERC20(token).safeTransfer(recv, amount);
     }
 }

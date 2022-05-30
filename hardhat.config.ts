@@ -55,13 +55,7 @@ const config: HardhatUserConfig = {
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 3,
       gas: "auto",
       minGasPrice: 1000000000,
@@ -71,13 +65,7 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 4,
       gas: "auto",
       gasPrice: 3100000000,
@@ -85,13 +73,7 @@ const config: HardhatUserConfig = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 1,
       gas: "auto",
       gasPrice: 22000000000,
@@ -99,13 +81,7 @@ const config: HardhatUserConfig = {
     },
     heco: {
       url: "https://http-mainnet.hecochain.com",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 128,
       gas: "auto",
       gasPrice: "auto",
@@ -113,13 +89,7 @@ const config: HardhatUserConfig = {
     },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 43114,
       gas: "auto",
       gasPrice: "auto",
@@ -127,13 +97,7 @@ const config: HardhatUserConfig = {
     },
     fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 43113,
       gas: "auto",
       gasPrice: "auto",
@@ -141,13 +105,7 @@ const config: HardhatUserConfig = {
     },
     polygon: {
       url: "https://polygon-rpc.com/",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 137,
       gas: "auto",
       gasPrice: 45100000000,
@@ -158,10 +116,6 @@ const config: HardhatUserConfig = {
       accounts: [
         // process.env.TESTER!,
         process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
       ],
       chainId: 250,
       // gas: "auto",
@@ -170,13 +124,7 @@ const config: HardhatUserConfig = {
     },
     bsctest: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 97,
       gas: "auto",
       gasPrice: 10e9, // 10 Gwei
@@ -184,13 +132,7 @@ const config: HardhatUserConfig = {
     },
     bsc: {
       url: "https://bsc-dataseed1.ninicoin.io/",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 56,
       gas: "auto",
       gasPrice: 10e9, // 10 Gwei
@@ -198,13 +140,7 @@ const config: HardhatUserConfig = {
     },
     metis: {
       url: "https://andromeda.metis.io/?owner=1088",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 1088,
       gas: "auto",
       gasPrice: 23e9, // 23 Gwei
@@ -212,13 +148,7 @@ const config: HardhatUserConfig = {
     },
     arbitrum: {
       url: "https://arb1.arbitrum.io/rpc",
-      accounts: [
-        process.env.MAIN_DEPLOYER_PRIVATE_KEY!,
-        process.env.SECOND_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEI_DEPLOYER_PRIVATE_KEY!,
-        process.env.DEUS_DEPLOYER_PRIVATE_KEY!,
-        process.env.veDEUS_DEPLOYER_PRIVATE_KEY!,
-      ],
+      accounts: [process.env.MAIN_DEPLOYER_PRIVATE_KEY!],
       chainId: 42161,
       gas: "auto",
       gasPrice: "auto",

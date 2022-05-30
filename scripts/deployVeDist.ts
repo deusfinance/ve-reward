@@ -24,19 +24,21 @@ async function deployRewardStrategy(): Promise<RewardStrategyV2> {
 
   console.log("Verifing reward strategy...");
 
-  await hre.run("verify:verify", {
-    address: rewardStrategy.address,
-    constructorArguments: rewardStrategyArgs,
-  });
+  try {
+    await hre.run("verify:verify", {
+      address: rewardStrategy.address,
+      constructorArguments: rewardStrategyArgs,
+    });
+  } catch (error) {
+    console.log(error);
+  }
   return rewardStrategy;
 }
 
 async function deployVeDist(): Promise<VeDistV2> {
-  // let rewardStrategyAddress = await (await deployRewardStrategy()).address;
-  let rewardStrategyAddress = "0x78db4155463527A7B1B4d3061325E0d99b62EEBb";
+  let rewardStrategyAddress = await (await deployRewardStrategy()).address;
+  // let rewardStrategyAddress = "0x78db4155463527A7B1B4d3061325E0d99b62EEBb";
 
-  let admin: SignerWithAddress;
-  admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_ADDRESS!);
   let networkType = getNetworkType(network.name);
   let veDistArgs = [
     networkConf[networkType!].admin,
@@ -51,10 +53,14 @@ async function deployVeDist(): Promise<VeDistV2> {
   console.log("VeDist deployed at: ", veDist.address);
   console.log("Waiting for etherscan sync...");
   await delay(1000 * 10);
-  await hre.run("verify:verify", {
-    address: veDist.address,
-    constructorArguments: veDistArgs,
-  });
+  try {
+    await hre.run("verify:verify", {
+      address: veDist.address,
+      constructorArguments: veDistArgs,
+    });
+  } catch (error) {
+    console.log(error);
+  }
   return veDist;
 }
 

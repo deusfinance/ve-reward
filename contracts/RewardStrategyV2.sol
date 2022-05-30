@@ -78,6 +78,7 @@ contract RewardStrategyV2 is AccessControl {
                 (getAprAt(index - 1) * power * (epoch + WEEK - startTime)) /
                 (DECIMALS * WEEK);
             times--;
+            epoch += WEEK;
         }
         uint256 length = min(index + times, aprsLength());
         for (uint256 i = index; i < length; i++) {
@@ -86,6 +87,7 @@ contract RewardStrategyV2 is AccessControl {
                 START_WEEK + WEEK * (i - 1) // voting power at the start of the week
             );
             reward += (getAprAt(i) * power) / DECIMALS; // apr sould be in week (wpr)
+            epoch += WEEK;
         }
 
         return (reward, epoch);
