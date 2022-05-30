@@ -15,6 +15,8 @@ contract RewardStrategyV2 is AccessControl {
     uint256 public constant DECIMALS = 1e6;
     bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
 
+    event SetAPR(uint256 apr, uint256 index);
+
     constructor(address admin, address ve_) {
         require(
             admin != address(0) && ve_ != address(0),
@@ -98,6 +100,7 @@ contract RewardStrategyV2 is AccessControl {
 
     function setAPR(uint256 apr) external onlyRole(SETTER_ROLE) {
         aprs.push(apr);
+        emit SetAPR(apr, aprs.length - 1);
     }
 
     function getAPR(uint256 tokenId, uint256 maxAPR)
