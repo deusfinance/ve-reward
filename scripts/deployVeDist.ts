@@ -11,7 +11,7 @@ function delay(ms: number) {
 
 async function deployRewardStrategy(): Promise<RewardStrategyV2> {
   let admin: SignerWithAddress;
-  admin = await ethers.getSigner(process.env.TESTER_ADDRESS!);
+  admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_ADDRESS!);
   let networkType = getNetworkType(network.name);
   let rewardStrategyArgs = [admin.address, networkConf[networkType!].ve];
 
@@ -32,11 +32,11 @@ async function deployRewardStrategy(): Promise<RewardStrategyV2> {
 }
 
 async function deployVeDist(): Promise<VeDistV2> {
-  //   let rewardStrategyAddress = await (await deployRewardStrategyV2()).address;
-  let rewardStrategyAddress = "0x392ee567631f79c610656bcf12cdea39afdba54b";
+  let rewardStrategyAddress = await (await deployRewardStrategy()).address;
+  // let rewardStrategyAddress = "0x392ee567631f79c610656bcf12cdea39afdba54b";
 
   let admin: SignerWithAddress;
-  admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_PRIVATE_KEY!);
+  admin = await ethers.getSigner(process.env.MAIN_DEPLOYER_ADDRESS!);
   let networkType = getNetworkType(network.name);
   let veDistArgs = [
     networkConf[networkType!].admin,

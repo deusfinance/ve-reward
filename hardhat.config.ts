@@ -165,7 +165,7 @@ const config: HardhatUserConfig = {
       ],
       chainId: 250,
       // gas: "auto",
-      gasPrice: 10000000000, // 10 Gwei
+      gasPrice: 50000000000, // 10 Gwei
       gasMultiplier: 1.2,
     },
     bsctest: {
