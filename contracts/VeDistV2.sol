@@ -33,8 +33,12 @@ contract VeDistV2 {
     {
         return
             lastClaim[tokenId] == 0
-                ? Ive(ve).user_point_history__ts(tokenId, 1)
+                ? startLockTime(tokenId)
                 : lastClaim[tokenId];
+    }
+
+    function startLockTime(uint256 tokenId) public view returns (uint256) {
+        return Ive(ve).user_point_history__ts(tokenId, 1);
     }
 
     function _sendReward(uint256 tokenId, uint256 reward) internal {
@@ -48,10 +52,10 @@ contract VeDistV2 {
         view
         returns (uint256)
     {
-        uint256 startTime = getLastClaimTimestamp(tokenId);
+        uint256 lastClaimTime = getLastClaimTimestamp(tokenId);
         uint256 aprsLength = IRewardStrategyV2(rewardStrategy).aprsLength();
         uint256 pendingStartIndex = IRewardStrategyV2(rewardStrategy)
-            .getPendingStartIndex(startTime);
+            .getPendingStartIndex(lastClaimTime);
         return aprsLength - pendingStartIndex;
     }
 
@@ -71,9 +75,9 @@ contract VeDistV2 {
             Ive(ve).isApprovedOrOwner(msg.sender, tokenId),
             "VeDist: NOT_APPROVED"
         );
-        uint256 startTimestamp = getLastClaimTimestamp(tokenId);
+        uint256 lastClaimTime = getLastClaimTimestamp(tokenId);
         (uint256 reward, uint256 epoch) = IRewardStrategyV2(rewardStrategy)
-            .getPendingReward(tokenId, startTimestamp, times);
+            .getPendingReward(tokenId, lastClaimTime, times);
         rewardBalance[tokenId] += reward;
         lastClaim[tokenId] = epoch;
         if (reward > 0) _sendReward(tokenId, reward);
@@ -81,7 +85,6 @@ contract VeDistV2 {
     }
 
     function claim(uint256 tokenId) external {
-        uint256 times = getPendingRewardsLength(tokenId);
-        _claim(tokenId, times);
+        _claim(tokenId, getPendingRewardsLength(tokenId));
     }
 }
