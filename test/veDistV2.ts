@@ -62,9 +62,7 @@ describe("VeDistV2", () => {
       .withArgs(ve1, 1)
       .returns(BigNumber.from(currentTimeStamp));
     await mockVe.mock.isApprovedOrOwner.returns(true);
-
     await mockRewardStrategy.mock.getPendingReward.returns([reward, epoch]);
-
     await mockRewardStrategy.mock.aprsLength.returns(BigNumber.from(2));
     await mockRewardStrategy.mock.getPendingStartIndex
       .withArgs(startTime)

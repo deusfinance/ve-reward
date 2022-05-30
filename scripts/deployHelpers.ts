@@ -54,8 +54,8 @@ async function deployVeDistV2(
 }
 
 async function deployRewardStrategyV2(
-  veAddress: string,
-  admin: string
+  admin: string,
+  veAddress: string
 ): Promise<RewardStrategyV2> {
   let factory = await ethers.getContractFactory("RewardStrategyV2");
   let aprStrategy = await factory.deploy(admin, veAddress);

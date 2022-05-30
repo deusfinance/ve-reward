@@ -5,6 +5,7 @@ pragma solidity 0.8.14;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/Ive.sol";
+import "hardhat/console.sol";
 
 contract RewardStrategyV2 is AccessControl {
     address public ve;
@@ -35,6 +36,7 @@ contract RewardStrategyV2 is AccessControl {
         return (timestamp / WEEK) * WEEK;
     }
 
+    // TODO: refactor
     function getPendingStartIndex(uint256 startTime)
         public
         pure
@@ -46,6 +48,16 @@ contract RewardStrategyV2 is AccessControl {
                 : ((startTime - START_WEEK) / WEEK) + 2;
     }
 
+    function getPowerAt(uint256 tokenId, uint256 time)
+        public
+        view
+        returns (uint256)
+    {
+        console.log(tokenId, time);
+        return Ive(ve).balanceOfNFTAt(tokenId, time);
+    }
+
+    // TODO: refactor
     function getPendingReward(
         uint256 tokenId,
         uint256 startTime,
@@ -59,18 +71,19 @@ contract RewardStrategyV2 is AccessControl {
 
         // when user comes between epochs
         if (startTime > epoch) {
-            power = Ive(ve).balanceOfNFTAt(tokenId, startTime);
+            power = getPowerAt(tokenId, startTime);
             apr = getAPR(tokenId, aprs[index - 1]);
             reward +=
                 (apr * power * (epoch + WEEK - startTime)) /
                 (DECIMALS * WEEK);
+            times--;
         }
         uint256 length = min(index + times, aprs.length);
         for (uint256 i = index; i < length; i++) {
             apr = getAPR(tokenId, aprs[i]); // apr at the end of the week
-            power = Ive(ve).balanceOfNFTAt(
+            power = getPowerAt(
                 tokenId,
-                START_WEEK + (i + index - 1) * WEEK // voting power at the start of the week
+                START_WEEK + WEEK * (i - 1) // voting power at the start of the week
             );
             reward += (apr * power) / DECIMALS; // apr sould be in week (wpr)
         }
