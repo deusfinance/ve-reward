@@ -30,14 +30,22 @@ contract RewardStrategyV2 is AccessControl {
         _setupRole(SETTER_ROLE, admin);
     }
 
+    /// @notice returns the length of all apr changes (one per week)
+    /// @return - aprs length
     function aprsLength() public view returns (uint256) {
         return aprs.length;
     }
 
+    /// @notice the last thursday night before the given timestamp
+    /// @param  timestamp: timestamp in seconds
+    /// @return - the epoch related to the timestamp
     function getEpoch(uint256 timestamp) public pure returns (uint256) {
         return (timestamp / WEEK) * WEEK;
     }
 
+    /// @notice calculates the index of the first epoch that user can claim
+    /// @param startTime: the time from which first eligible
+    /// @return - index of first eligible index to claim
     function getPendingStartIndex(uint256 startTime)
         public
         pure
@@ -47,6 +55,9 @@ contract RewardStrategyV2 is AccessControl {
         return (startTime - START_EPOCH) / WEEK + 1;
     }
 
+    /// @notice collects the amount of pending rewards, from the given time up to now
+    /// @param startTime: the timestamp(in seconds) from which pending rewards are calculated
+    /// @return - total claimed reward and the next eligible epoch
     function getPendingReward(
         uint256 tokenId,
         uint256 startTime,
@@ -69,6 +80,8 @@ contract RewardStrategyV2 is AccessControl {
         return (reward, epoch);
     }
 
+    /// @notice set APR per week
+    /// @param apr apr to be sest
     function setAPR(uint256 apr) external onlyRole(SETTER_ROLE) {
         aprs.push(apr);
         emit SetAPR(apr, aprs.length - 1);
