@@ -6,13 +6,16 @@ pragma solidity 0.8.14;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/Ive.sol";
 
+/// @title veDEUS reward strategy
+/// @author DEUS Finance
+/// @notice calculate the veDEUS rewards for every 7 days
 contract RewardStrategyV2 is AccessControl {
     address public ve;
     uint256[] public aprs; // epoch index => max apr
-    uint256 public constant MAX_LOCK_TIME = 4 * 365 * 86400;
-    uint256 public constant START_WEEK = 1647475200; // Thursday, March 17, 2022 12:00:00 AM
-    uint256 public constant WEEK = 7 * 86400;
     uint256 public constant DECIMALS = 1e6;
+    uint256 public constant WEEK = 7 * 86400;
+    uint256 public constant START_EPOCH = 1648080000; // Thursday, March 24, 2022 12:00:00 AM
+    uint256 public constant MAX_LOCK_TIME = 4 * 365 * 86400; // 4 years
     bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
 
     event SetAPR(uint256 apr, uint256 index);
@@ -22,14 +25,14 @@ contract RewardStrategyV2 is AccessControl {
             admin != address(0) && ve_ != address(0),
             "RewardStrategyV2: ZERO_ADDRESS"
         );
+        ve = ve_;
+
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
         _setupRole(SETTER_ROLE, admin);
-
-        ve = ve_;
     }
 
     function aprsLength() public view returns (uint256) {
-        return (block.timestamp - START_WEEK) / WEEK + 1;
+        return (now - START_EPOCH) / WEEK + 1;
     }
 
     function getAprAt(uint256 index) public view returns (uint256) {
@@ -49,7 +52,9 @@ contract RewardStrategyV2 is AccessControl {
         returns (uint256)
     {
         return
-            (startTime < START_WEEK) ? 1 : (startTime - START_WEEK) / WEEK + 2;
+            (startTime < START_EPOCH)
+                ? 1
+                : (startTime - START_EPOCH) / WEEK + 2;
     }
 
     function getPowerAt(uint256 tokenId, uint256 time)
@@ -84,7 +89,7 @@ contract RewardStrategyV2 is AccessControl {
         for (uint256 i = index; i < length; i++) {
             power = getPowerAt(
                 tokenId,
-                START_WEEK + WEEK * (i - 1) // voting power at the start of the week
+                START_EPOCH + WEEK * (i - 1) // voting power at the start of the week
             );
             reward += (getAprAt(i) * power) / DECIMALS; // apr sould be in week (wpr)
             epoch += WEEK;
