@@ -32,7 +32,7 @@ contract RewardStrategyV2 is AccessControl {
     }
 
     function aprsLength() public view returns (uint256) {
-        return (now - START_EPOCH) / WEEK + 1;
+        return (block.timestamp - START_EPOCH) / WEEK + 1;
     }
 
     function getAprAt(uint256 index) public view returns (uint256) {
