@@ -31,6 +31,13 @@ contract VeDistV2 is AccessControl {
         address rewardStrategy_,
         address deus_
     ) {
+        require(
+            admin != address(0) &&
+                ve_ != address(0) &&
+                rewardStrategy_ != address(0) &&
+                deus_ != address(0),
+            "VeDistV2: ZERO_ADDRESS"
+        );
         ve = ve_;
         rewardStrategy = rewardStrategy_;
         deus = deus_;
