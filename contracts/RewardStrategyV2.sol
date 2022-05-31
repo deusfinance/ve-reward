@@ -63,7 +63,7 @@ contract RewardStrategyV2 is AccessControl {
             uint256 power = Ive(ve).balanceOfNFTAt(tokenId, _startTime);
             uint256 endOfWeek = epoch + WEEK;
             uint256 powerWeight = (endOfWeek - _startTime);
-            reward += (power * aprs[i] * powerWeight) / WEEK;
+            reward += (power * aprs[i] * powerWeight) / (DECIMALS * WEEK);
             epoch += WEEK;
         }
         return (reward, epoch);

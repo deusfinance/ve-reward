@@ -17,10 +17,10 @@ describe("RewardStrategyV2", () => {
   let vePower1: BigNumber = BigNumber.from(2000);
   let vePower2: BigNumber = BigNumber.from(3000);
 
-  let amount0 = BigNumber.from(1000);
-  let amount1 = BigNumber.from(2000);
-  let amount2 = BigNumber.from(500);
-  let amount3 = BigNumber.from(2500);
+  let amount0 = BigNumber.from(1000000000);
+  let amount1 = BigNumber.from(2000000000);
+  let amount2 = BigNumber.from(500000000);
+  let amount3 = BigNumber.from(2500000000);
   let startWeek = BigNumber.from(1648080000);
   let week = BigNumber.from(7 * 86400);
   before(async () => {
