@@ -13,6 +13,9 @@ describe("RewardStrategyV2", () => {
   let me: SignerWithAddress;
   let user1: SignerWithAddress;
   let ve1 = BigNumber.from(1);
+
+  let decimals: BigNumber = BigNumber.from(1000000);
+
   let vePower0: BigNumber = BigNumber.from(1000);
   let vePower1: BigNumber = BigNumber.from(2000);
   let vePower2: BigNumber = BigNumber.from(3000);
@@ -85,7 +88,8 @@ describe("RewardStrategyV2", () => {
       .sub(lockTime)
       .mul(amount0)
       .mul(vePower0)
-      .div(week);
+      .div(week)
+      .div(decimals);
     await mockVe.mock.balanceOfNFTAt.withArgs(ve1, lockTime).returns(vePower0);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
@@ -98,7 +102,8 @@ describe("RewardStrategyV2", () => {
       .sub(lockTime)
       .mul(amount1)
       .mul(vePower1)
-      .div(week);
+      .div(week)
+      .div(decimals);
     await mockVe.mock.balanceOfNFTAt.withArgs(ve1, lockTime).returns(vePower1);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
@@ -113,9 +118,9 @@ describe("RewardStrategyV2", () => {
     await mockVe.mock.balanceOfNFTAt.withArgs(ve1, week0Time).returns(vePower1); // power at week 0
     await mockVe.mock.balanceOfNFTAt.withArgs(ve1, week1Time).returns(vePower2); // power at week 1
 
-    let correctRewardWeekBefore0 = amount0.mul(vePower0).div(2);
-    let correctRewardWeek0 = amount1.mul(vePower1);
-    let correctRewardWeek1 = amount2.mul(vePower2);
+    let correctRewardWeekBefore0 = amount0.mul(vePower0).div(2).div(decimals);
+    let correctRewardWeek0 = amount1.mul(vePower1).div(decimals);
+    let correctRewardWeek1 = amount2.mul(vePower2).div(decimals);
     let totalReward = correctRewardWeekBefore0
       .add(correctRewardWeek0)
       .add(correctRewardWeek1);
