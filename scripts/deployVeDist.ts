@@ -36,7 +36,7 @@ async function deployRewardStrategy(): Promise<RewardStrategyV2> {
 }
 
 async function deployVeDist(): Promise<VeDistV2> {
-  let rewardStrategyAddress = await (await deployRewardStrategy()).address;
+  let rewardStrategyAddress = (await deployRewardStrategy()).address;
   // let rewardStrategyAddress = "0x78db4155463527A7B1B4d3061325E0d99b62EEBb";
 
   let networkType = getNetworkType(network.name);
