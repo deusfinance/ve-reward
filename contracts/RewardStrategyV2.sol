@@ -34,10 +34,6 @@ contract RewardStrategyV2 is AccessControl {
         return aprs.length;
     }
 
-    function getAprAt(uint256 index) public view returns (uint256) {
-        return aprs[index];
-    }
-
     function getEpoch(uint256 timestamp) public pure returns (uint256) {
         return (timestamp / WEEK) * WEEK;
     }
@@ -49,14 +45,6 @@ contract RewardStrategyV2 is AccessControl {
     {
         if (startTime < START_EPOCH) return 0;
         return (startTime - START_EPOCH) / WEEK + 1;
-    }
-
-    function getPowerAt(uint256 tokenId, uint256 time)
-        public
-        view
-        returns (uint256)
-    {
-        return Ive(ve).balanceOfNFTAt(tokenId, time);
     }
 
     function getPendingReward(
@@ -72,10 +60,10 @@ contract RewardStrategyV2 is AccessControl {
 
         for (uint256 i = index; i < length; i++) {
             uint256 _startTime = max(startTime, epoch);
-            uint256 power = getPowerAt(tokenId, _startTime);
+            uint256 power = Ive(ve).balanceOfNFTAt(tokenId, _startTime);
             uint256 endOfWeek = epoch + WEEK;
             uint256 powerWeight = (endOfWeek - _startTime);
-            reward += (power * getAprAt(i) * powerWeight) / WEEK;
+            reward += (power * aprs[i] * powerWeight) / WEEK;
             epoch += WEEK;
         }
         return (reward, epoch);
