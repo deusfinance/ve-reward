@@ -67,23 +67,15 @@ contract RewardStrategyV2 is AccessControl {
         require(times > 0, "RewardStrategyV2: TIMES_ZERO");
         uint256 index = getPendingStartIndex(startTime);
         uint256 epoch = getEpoch(startTime);
+        uint256 length = min(index + times, aprsLength());
         uint256 reward;
 
-        if (startTime >= epoch) {
-            // lock time is in the middle of the week
-            epoch += WEEK;
-            uint256 power = getPowerAt(tokenId, startTime);
-            uint256 powerWeight = (epoch - startTime);
-            reward += (power * getAprAt(index) * powerWeight) / WEEK;
-            times--; // one time claimed
-            index++; // one pending index increased
-        }
-
-        uint256 length = min(index + times, aprsLength());
         for (uint256 i = index; i < length; i++) {
-            uint256 power = getPowerAt(tokenId, epoch);
-            uint256 apr = getAprAt(i);
-            reward += power * apr;
+            uint256 _startTime = max(startTime, epoch);
+            uint256 power = getPowerAt(tokenId, _startTime);
+            uint256 endOfWeek = epoch + WEEK;
+            uint256 powerWeight = (endOfWeek - _startTime);
+            reward += (power * getAprAt(i) * powerWeight) / WEEK;
             epoch += WEEK;
         }
         return (reward, epoch);
@@ -92,6 +84,10 @@ contract RewardStrategyV2 is AccessControl {
     function setAPR(uint256 apr) external onlyRole(SETTER_ROLE) {
         aprs.push(apr);
         emit SetAPR(apr, aprs.length - 1);
+    }
+
+    function max(uint256 a, uint256 b) public pure returns (uint256) {
+        return a > b ? a : b;
     }
 
     function min(uint256 a, uint256 b) public pure returns (uint256) {
