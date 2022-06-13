@@ -17,13 +17,10 @@ async function getAddress() {
 
 async function setApr() {
   const [admin] = await ethers.getSigners();
-  const _blocks = new Blocks("https://rpc.ftm.tools");
   const rewardStrategy = await ethers.getContractAt(
     "RewardStrategyV2",
     await getAddress() // use actual contract address here
   );
-  const startTimestamp = 1648080000;
-  const week = 86400 * 7;
   const aprs = [
     19000, // 1
     19000, // 2
@@ -45,7 +42,7 @@ async function setApr() {
   ];
 
   for (var i = 0; i < 12; i++) {
-    await rewardStrategy.setAPR(aprs[i], rewardBlocks[i]);
+    await rewardStrategy.connect(admin).setAPR(aprs[i], rewardBlocks[i]);
     console.log(`${i + 1}/12`);
   }
 }
