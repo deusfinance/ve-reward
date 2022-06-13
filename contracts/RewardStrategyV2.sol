@@ -11,7 +11,9 @@ import "./interfaces/Ive.sol";
 /// @notice calculate the veDEUS rewards for every 7 days
 contract RewardStrategyV2 is AccessControl {
     address public ve;
-    uint256[] public aprs; // epoch index => max apr
+    mapping(uint256 => uint256) public aprs; // epoch index => max apr
+    mapping(uint256 => uint256) public timeToBlock;
+    uint256 public aprsLength;
     uint256 public constant DECIMALS = 1e6;
     uint256 public constant WEEK = 7 * 86400;
     uint256 public constant START_EPOCH = 1648080000; // Thursday, March 24, 2022 12:00:00 AM
@@ -28,12 +30,6 @@ contract RewardStrategyV2 is AccessControl {
 
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
         _setupRole(SETTER_ROLE, admin);
-    }
-
-    /// @notice returns the length of all apr changes (one per week)
-    /// @return - aprs length
-    function aprsLength() public view returns (uint256) {
-        return aprs.length;
     }
 
     /// @notice the last thursday night before the given timestamp
@@ -66,12 +62,15 @@ contract RewardStrategyV2 is AccessControl {
         require(times > 0, "RewardStrategyV2: TIMES_ZERO");
         uint256 index = getPendingStartIndex(startTime);
         uint256 epoch = getEpoch(startTime);
-        uint256 length = min(index + times, aprsLength());
+        uint256 length = min(index + times, aprsLength);
         uint256 reward;
 
         for (uint256 i = index; i < length; i++) {
             uint256 _startTime = max(startTime, epoch);
-            uint256 power = Ive(ve).balanceOfNFTAt(tokenId, _startTime);
+            uint256 power = Ive(ve).balanceOfAtNFT(
+                tokenId,
+                timeToBlock[_startTime]
+            );
             uint256 endOfWeek = epoch + WEEK;
             uint256 powerWeight = (endOfWeek - _startTime);
             reward += (power * aprs[i] * powerWeight) / (DECIMALS * WEEK);
@@ -82,9 +81,22 @@ contract RewardStrategyV2 is AccessControl {
 
     /// @notice set APR per week
     /// @param apr apr to be sest
-    function setAPR(uint256 apr) external onlyRole(SETTER_ROLE) {
-        aprs.push(apr);
-        emit SetAPR(apr, aprs.length - 1);
+    function _setAPR(
+        uint256 index,
+        uint256 apr,
+        uint256 _block
+    ) public onlyRole(SETTER_ROLE) {
+        aprs[index] = apr;
+        timeToBlock[START_EPOCH + index * WEEK] = _block;
+        emit SetAPR(apr, index);
+    }
+
+    function setAPR(uint256 apr, uint256 _block)
+        external
+        onlyRole(SETTER_ROLE)
+    {
+        _setAPR(aprsLength, apr, _block);
+        aprsLength++;
     }
 
     function max(uint256 a, uint256 b) public pure returns (uint256) {

@@ -12,6 +12,8 @@ interface Ive {
 
     function balanceOfNFTAt(uint256, uint256) external view returns (uint256);
 
+    function balanceOfAtNFT(uint256, uint256) external view returns (uint256);
+
     function isApprovedOrOwner(address, uint256) external view returns (bool);
 
     function ownerOf(uint256) external view returns (address);

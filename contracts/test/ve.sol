@@ -11,6 +11,10 @@ contract VeTest is Ive {
         return 0;
     }
 
+    function balanceOfAtNFT(uint256, uint256) external pure returns (uint256) {
+        return 0;
+    }
+
     function isApprovedOrOwner(address, uint256) external pure returns (bool) {
         return true;
     }
