@@ -16,7 +16,7 @@ async function getAddress() {
   return sampleRewardStrategy.address;
 }
 
-async function timestampToBlock(timestamp: BigNumber) {
+async function timestampToBlock(timestamp: number) {
   const _blocks = new Blocks("https://rpc.ftm.tools");
   const { block } = (await _blocks.getDate(
     timestamp.toString()
@@ -51,7 +51,10 @@ async function setApr() {
   ];
 
   for (var i = 0; i < 12; i++) {
-    await rewardStrategy.connect(admin).setAPR(aprs[i], rewardBlocks[i]);
+    let tx = await rewardStrategy
+      .connect(admin)
+      .setAPR(aprs[i], rewardBlocks[i]);
+    await tx.wait(1);
     console.log(`${i + 1}/12`);
   }
 }
