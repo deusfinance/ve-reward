@@ -3,6 +3,7 @@ import Blocks, { BlockResponse } from "eth-block-timestamp";
 import { deployRewardStrategyV2 } from "./deployHelpers";
 import { deployMockContract } from "ethereum-waffle";
 import { Ive__factory } from "../typechain";
+import { BigNumber } from "ethers";
 
 async function getAddress() {
   const [admin] = await ethers.getSigners();
@@ -13,6 +14,14 @@ async function getAddress() {
     mockVe.address
   );
   return sampleRewardStrategy.address;
+}
+
+async function timestampToBlock(timestamp: BigNumber) {
+  const _blocks = new Blocks("https://rpc.ftm.tools");
+  const { block } = (await _blocks.getDate(
+    timestamp.toString()
+  )) as BlockResponse;
+  return block;
 }
 
 async function setApr() {
