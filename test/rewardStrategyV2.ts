@@ -5,7 +5,17 @@ import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 import { deployRewardStrategyV2 } from "../scripts/deployHelpers";
 import { RewardStrategyV2, VeTest__factory } from "../typechain";
-import { getCurrentTimeStamp, increaseTime } from "./timeUtils";
+import {
+  getCurrentTimeStamp,
+  getLatestBlcok,
+  increaseTime,
+  setTimeToNextThursdayMidnight,
+} from "./timeUtils";
+
+async function setApr(rewardStrategy: RewardStrategyV2, amount: BigNumber) {
+  await setTimeToNextThursdayMidnight();
+  await rewardStrategy.setAPR(amount, await getLatestBlcok());
+}
 
 describe("RewardStrategyV2", () => {
   let mockVe: MockContract;
@@ -32,20 +42,20 @@ describe("RewardStrategyV2", () => {
     rewardStrategy = await deployRewardStrategyV2(me.address, mockVe.address);
   });
   it("should not allow non-setter role to set apr", async () => {
-    let tx = rewardStrategy.connect(user1).setAPR(amount0);
+    let tx = rewardStrategy.connect(user1).setAPR(amount0, 0);
     await expect(tx).to.be.reverted;
   });
   it("should allow setter role to set week", async () => {
-    await rewardStrategy.setAPR(amount0);
+    await setApr(rewardStrategy, amount0);
     let aprLength = await rewardStrategy.aprsLength();
     let apr = await rewardStrategy.aprs(0);
     expect(aprLength).eq(1);
     expect(apr).eq(amount0); // week 0 apr
   });
   it("should set week 1,2 and 3 aprs", async () => {
-    await rewardStrategy.setAPR(amount1);
-    await rewardStrategy.setAPR(amount2);
-    await rewardStrategy.setAPR(amount3);
+    await setApr(rewardStrategy, amount1);
+    await setApr(rewardStrategy, amount2);
+    await setApr(rewardStrategy, amount3);
     let aprsLength = await rewardStrategy.aprsLength();
     let apr1 = await rewardStrategy.aprs(1);
     let apr2 = await rewardStrategy.aprs(2);
@@ -84,19 +94,22 @@ describe("RewardStrategyV2", () => {
   });
   it("should return correct pending reward for locked time before start week", async () => {
     let lockTime = startWeek.sub(week.div(2));
+    let lockBlock = await rewardStrategy.timeToBlock(lockTime);
     let correctReward = startWeek
       .sub(lockTime)
       .mul(amount0)
       .mul(vePower0)
       .div(week)
       .div(decimals);
-    await mockVe.mock.balanceOfNFTAt.withArgs(ve1, lockTime).returns(vePower0);
+    await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower0);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
     expect(pendingReward[1]).eq(startWeek);
   });
   it("should return correct pending reward if started after startweek", async () => {
     let lockTime = startWeek.add(week.div(2));
+    let lockBlock = await rewardStrategy.timeToBlock(lockTime);
+
     let correctReward = startWeek
       .add(week)
       .sub(lockTime)
@@ -104,19 +117,26 @@ describe("RewardStrategyV2", () => {
       .mul(vePower1)
       .div(week)
       .div(decimals);
-    await mockVe.mock.balanceOfNFTAt.withArgs(ve1, lockTime).returns(vePower1);
+    await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower1);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
     expect(pendingReward[1]).eq(startWeek.add(week));
   });
   it("should return correct pending reward for three times claim if locked before startWeek", async () => {
     let lockTime = startWeek.sub(week.div(2));
+    let lockBlock = await rewardStrategy.timeToBlock(lockTime);
     let week0Time = startWeek;
+    let week0Block = await rewardStrategy.timeToBlock(startWeek);
     let week1Time = startWeek.add(week);
+    let week1Block = await rewardStrategy.timeToBlock(week1Time);
     let week2Time = week1Time.add(week);
-    await mockVe.mock.balanceOfNFTAt.withArgs(ve1, lockTime).returns(vePower0); // power before week 0
-    await mockVe.mock.balanceOfNFTAt.withArgs(ve1, week0Time).returns(vePower1); // power at week 0
-    await mockVe.mock.balanceOfNFTAt.withArgs(ve1, week1Time).returns(vePower2); // power at week 1
+    await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower0); // power before week 0
+    await mockVe.mock.balanceOfAtNFT
+      .withArgs(ve1, week0Block)
+      .returns(vePower1); // power at week 0
+    await mockVe.mock.balanceOfAtNFT
+      .withArgs(ve1, week1Block)
+      .returns(vePower2); // power at week 1
 
     let correctRewardWeekBefore0 = amount0.mul(vePower0).div(2).div(decimals);
     let correctRewardWeek0 = amount1.mul(vePower1).div(decimals);

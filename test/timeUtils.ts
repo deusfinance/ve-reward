@@ -2,6 +2,11 @@ import { ethers, network } from "hardhat";
 
 let week = 86400 * 7;
 
+async function getLatestBlcok(): Promise<number> {
+  const latestBlock = await ethers.provider.getBlock("latest");
+  return latestBlock.number;
+}
+
 async function getCurrentTimeStamp(): Promise<number> {
   const blockNumBefore = await ethers.provider.getBlockNumber();
   const blockBefore = await ethers.provider.getBlock(blockNumBefore);
@@ -36,4 +41,5 @@ export {
   setTimeToNextThursdayMidnight,
   increaseTime,
   getActivePeriod,
+  getLatestBlcok,
 };
