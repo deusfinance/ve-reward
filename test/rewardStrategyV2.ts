@@ -125,7 +125,6 @@ describe("RewardStrategyV2", () => {
   it("should return correct pending reward for three times claim if locked before startWeek", async () => {
     let lockTime = startWeek.sub(week.div(2));
     let lockBlock = await rewardStrategy.timeToBlock(lockTime);
-    let week0Time = startWeek;
     let week0Block = await rewardStrategy.timeToBlock(startWeek);
     let week1Time = startWeek.add(week);
     let week1Block = await rewardStrategy.timeToBlock(week1Time);
