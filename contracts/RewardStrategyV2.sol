@@ -81,7 +81,7 @@ contract RewardStrategyV2 is AccessControl {
 
     /// @notice set APR per week
     /// @param apr apr to be sest
-    function _setAPR(
+    function setAPRAt(
         uint256 index,
         uint256 apr,
         uint256 _block
@@ -91,11 +91,8 @@ contract RewardStrategyV2 is AccessControl {
         emit SetAPR(apr, index);
     }
 
-    function setAPR(uint256 apr, uint256 _block)
-        external
-        onlyRole(SETTER_ROLE)
-    {
-        _setAPR(aprsLength, apr, _block);
+    function setAPR(uint256 apr, uint256 _block) external {
+        setAPRAt(aprsLength, apr, _block);
         aprsLength++;
     }
 

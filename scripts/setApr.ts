@@ -1,3 +1,4 @@
+import * as dotenv from "dotenv";
 import { ethers } from "hardhat";
 import Blocks, { BlockResponse } from "eth-block-timestamp";
 import { deployRewardStrategyV2 } from "./deployHelpers";
@@ -17,7 +18,9 @@ async function getAddress() {
 }
 
 async function timestampToBlock(timestamp: number) {
-  const _blocks = new Blocks("https://rpc.ftm.tools");
+  const _blocks = new Blocks(
+    `https://rpc.ankr.com/fantom/${process.env.ANKR_API_KEY}`
+  );
   const { block } = (await _blocks.getDate(
     timestamp.toString()
   )) as BlockResponse;
@@ -28,7 +31,7 @@ async function setApr() {
   const [admin] = await ethers.getSigners();
   const rewardStrategy = await ethers.getContractAt(
     "RewardStrategyV2",
-    await getAddress() // use actual contract address here
+    "0x187aBc9FD91a6E2A3E8ED42a532599105ef36972"
   );
   const aprs = [
     19000, // 1

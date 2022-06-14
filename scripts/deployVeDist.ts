@@ -62,7 +62,12 @@ async function deployVeDist(): Promise<VeDistV2> {
   return veDist;
 }
 
-deployVeDist()
+// deployVeDist()
+//   .then(() => {
+//     process.exit();
+//   })
+//   .catch(console.log);
+deployRewardStrategy()
   .then(() => {
     process.exit();
   })
