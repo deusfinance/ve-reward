@@ -67,10 +67,14 @@ contract RewardStrategyV2 is AccessControl {
 
         for (uint256 i = index; i < length; i++) {
             uint256 _startTime = max(startTime, epoch);
-            uint256 power = Ive(ve).balanceOfAtNFT(
-                tokenId,
-                timeToBlock[_startTime]
-            );
+            uint256 blk;
+            if (startTime > epoch) {
+                blk = Ive(ve).user_point_history(tokenId)[1].blk;
+            } else {
+                blk = timeToBlock[_startTime];
+            }
+            uint256 power = Ive(ve).balanceOfAtNFT(tokenId, blk);
+
             uint256 endOfWeek = epoch + WEEK;
             uint256 powerWeight = (endOfWeek - _startTime);
             reward += (power * aprs[i] * powerWeight) / (DECIMALS * WEEK);

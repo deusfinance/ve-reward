@@ -38,4 +38,10 @@ contract VeTest is Ive {
         view
         returns (uint256)
     {}
+
+    function user_point_history(uint256 _idx)
+        external
+        view
+        returns (Point[] memory)
+    {}
 }

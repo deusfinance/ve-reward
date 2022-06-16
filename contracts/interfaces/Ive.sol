@@ -2,12 +2,19 @@
 
 pragma solidity 0.8.14;
 
-interface Ive {
-    struct LockedBalance {
-        int128 amount;
-        uint256 end;
-    }
+struct Point {
+    int128 bias;
+    int128 slope; // # -dweight / dt
+    uint256 ts;
+    uint256 blk; // block
+}
 
+struct LockedBalance {
+    int128 amount;
+    uint256 end;
+}
+
+interface Ive {
     function token() external view returns (address);
 
     function balanceOfNFTAt(uint256, uint256) external view returns (uint256);
@@ -30,4 +37,6 @@ interface Ive {
         external
         view
         returns (uint256);
+
+    function user_point_history(uint256) external view returns (Point[] memory);
 }

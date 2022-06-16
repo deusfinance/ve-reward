@@ -101,6 +101,23 @@ describe("RewardStrategyV2", () => {
       .mul(vePower0)
       .div(week)
       .div(decimals);
+    await mockVe.mock.user_point_history.withArgs(ve1).returns([
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+    ]);
+    await mockVe.mock.balanceOfAtNFT
+      .withArgs(ve1, BigNumber.from(33850278))
+      .returns(vePower0);
     await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower0);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
@@ -117,6 +134,23 @@ describe("RewardStrategyV2", () => {
       .mul(vePower1)
       .div(week)
       .div(decimals);
+    await mockVe.mock.user_point_history.withArgs(ve1).returns([
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+    ]);
+    await mockVe.mock.balanceOfAtNFT
+      .withArgs(ve1, BigNumber.from(33850278))
+      .returns(vePower1);
     await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower1);
     let pendingReward = await rewardStrategy.getPendingReward(ve1, lockTime, 1);
     expect(pendingReward[0]).eq(correctReward);
@@ -129,6 +163,23 @@ describe("RewardStrategyV2", () => {
     let week1Time = startWeek.add(week);
     let week1Block = await rewardStrategy.timeToBlock(week1Time);
     let week2Time = week1Time.add(week);
+    await mockVe.mock.user_point_history.withArgs(ve1).returns([
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+      {
+        bias: BigNumber.from("29863555222573306206"),
+        slope: BigNumber.from(237823439878),
+        ts: BigNumber.from(1647703323),
+        blk: BigNumber.from(33850278),
+      },
+    ]);
+    await mockVe.mock.balanceOfAtNFT
+      .withArgs(ve1, BigNumber.from(33850278))
+      .returns(vePower0);
     await mockVe.mock.balanceOfAtNFT.withArgs(ve1, lockBlock).returns(vePower0); // power before week 0
     await mockVe.mock.balanceOfAtNFT
       .withArgs(ve1, week0Block)

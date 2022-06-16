@@ -31,7 +31,7 @@ async function setApr() {
   const [admin] = await ethers.getSigners();
   const rewardStrategy = await ethers.getContractAt(
     "RewardStrategyV2",
-    "0x187aBc9FD91a6E2A3E8ED42a532599105ef36972"
+    "0x562713a7854A4DBd162CB17CF37EBa2Bfaf74fd7"
   );
   const aprs = [
     19000, // 1
@@ -46,19 +46,20 @@ async function setApr() {
     19000, // 10
     19000, // 11
     7000, // 12
+    5000, // 13
   ];
 
   let rewardBlocks = [
     34234559, 34835624, 35416944, 35993480, 36575088, 37106977, 37568823,
-    38067886, 38546237, 39062041, 39576860, 40098193,
+    38067886, 38546237, 39062041, 39576860, 40098193, 40607607,
   ];
 
-  for (var i = 0; i < 12; i++) {
+  for (var i = 0; i < 13; i++) {
     let tx = await rewardStrategy
       .connect(admin)
       .setAPR(aprs[i], rewardBlocks[i]);
     await tx.wait(1);
-    console.log(`${i + 1}/12`);
+    console.log(`${i + 1}/13`);
   }
 }
 
