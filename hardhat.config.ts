@@ -112,7 +112,7 @@ const config: HardhatUserConfig = {
       gasMultiplier: 1.2,
     },
     fantom: {
-      url: `https://rpc.ankr.com/fantom/${process.env.ANKR_API_KEY}`,
+      url: `https://rpc.ankr.com/fantom/`,
       accounts: [
         // process.env.TESTER!,
         process.env.MAIN_DEPLOYER_PRIVATE_KEY!,

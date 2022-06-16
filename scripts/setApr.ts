@@ -31,7 +31,7 @@ async function setApr() {
   const [admin] = await ethers.getSigners();
   const rewardStrategy = await ethers.getContractAt(
     "RewardStrategyV2",
-    "0x562713a7854A4DBd162CB17CF37EBa2Bfaf74fd7"
+    "0x1930DFb9f26B08b7d87f92859098A349885e71e0"
   );
   const aprs = [
     19000, // 1

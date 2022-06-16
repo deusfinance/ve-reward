@@ -69,7 +69,7 @@ contract RewardStrategyV2 is AccessControl {
             uint256 _startTime = max(startTime, epoch);
             uint256 blk;
             if (startTime > epoch) {
-                blk = Ive(ve).user_point_history(tokenId)[1].blk;
+                blk = Ive(ve).user_point_history(tokenId, 1).blk;
             } else {
                 blk = timeToBlock[_startTime];
             }

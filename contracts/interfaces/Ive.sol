@@ -38,5 +38,8 @@ interface Ive {
         view
         returns (uint256);
 
-    function user_point_history(uint256) external view returns (Point[] memory);
+    function user_point_history(uint256, uint256)
+        external
+        view
+        returns (Point memory);
 }
